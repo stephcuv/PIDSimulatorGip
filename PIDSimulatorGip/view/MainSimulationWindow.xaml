@@ -5,8 +5,24 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:PIDSimulatorGip.view"
         mc:Ignorable="d"
-        Title="MainSimulationWindow" Height="450" Width="800">
-    <Grid>
-        
+        Title="MainSimulationWindow" MinHeight="450" MinWidth="800">
+    <Grid Background="SlateGray">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="auto"/>
+            <ColumnDefinition/>
+            <ColumnDefinition/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+
+        <Grid Grid.RowSpan="2" Background="DimGray">
+            <StackPanel>
+                <Button Margin="10,50" Height="20" Width="20" Background="DimGray" BorderThickness="0">
+                    <Image/>
+                </Button>
+            </StackPanel>
+        </Grid>
     </Grid>
 </Window>
