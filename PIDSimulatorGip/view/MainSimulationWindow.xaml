@@ -11,18 +11,29 @@
             <ColumnDefinition Width="auto"/>
             <ColumnDefinition/>
             <ColumnDefinition/>
+            <ColumnDefinition/>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition/>
             <RowDefinition/>
         </Grid.RowDefinitions>
-
-        <Grid Grid.RowSpan="2" Background="DimGray">
-            <StackPanel>
-                <Button Margin="10,50" Height="20" Width="20" Background="DimGray" BorderThickness="0">
-                    <Image/>
-                </Button>
-            </StackPanel>
-        </Grid>
+        <StackPanel Grid.RowSpan="2" Background="DimGray" HorizontalAlignment="Center">
+            <Button Margin="10,50" Height="20" Width="20" Background="White"/>
+            <Button Margin="10,30" Height="20" Width="20" Background="White"/>
+            <Button Margin="10,30" Height="20" Width="20" Background="White"/>
+            <Button Margin="10,30" Height="20" Width="20" Background="White"/>
+        </StackPanel>
+        <StackPanel Grid.Column="2" HorizontalAlignment="Center">
+            <TextBlock Text="SerialComunication" FontSize="15" Foreground="White" Margin="0,0,0,20" HorizontalAlignment="Center"/>
+            <WrapPanel HorizontalAlignment="Center">
+                <TextBlock Text="auto connect" FontSize="15" Foreground="White"/>
+                <CheckBox IsChecked="True" Margin="5,4"/>
+            </WrapPanel>
+            <ComboBox Name="SerialSelectionCbm"/>
+            <WrapPanel>
+                <Button Content="connect" Name="SerialConnectBtn" Height="20" Width="60" Margin="10"/>
+                <Button Content="disconnect" Name="SerialDisconectBtn" Height="20" Width="60" Margin="10"/>
+            </WrapPanel>
+        </StackPanel>
     </Grid>
 </Window>
