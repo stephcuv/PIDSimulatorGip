@@ -23,5 +23,10 @@ namespace PIDSimulatorGip.view
         {
             InitializeComponent();
         }
+
+        private void ControlStackPanel_GiveFeedback(object sender, GiveFeedbackEventArgs e)
+        {
+
+        }
     }
 }
