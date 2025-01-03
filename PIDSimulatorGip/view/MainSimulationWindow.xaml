@@ -9,20 +9,26 @@
     <Grid Background="SlateGray">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="auto"/>
-            <ColumnDefinition/>
-            <ColumnDefinition/>
+            <ColumnDefinition Width="auto"/>
+            <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition/>
             <RowDefinition/>
         </Grid.RowDefinitions>
-        <StackPanel Grid.RowSpan="2" Background="DimGray" HorizontalAlignment="Center">
-            <Button Margin="10,50" Height="20" Width="20" Background="White"/>
-            <Button Margin="10,30" Height="20" Width="20" Background="White"/>
-            <Button Margin="10,30" Height="20" Width="20" Background="White"/>
-            <Button Margin="10,30" Height="20" Width="20" Background="White"/>
-        </StackPanel>
-        <Grid Grid.Column="1" Name="PIDControlGrid" Margin="15" HorizontalAlignment="Left">
+        <Grid Grid.RowSpan="2" Background="DimGray" HorizontalAlignment="Center">
+            <Grid.RowDefinitions>
+                <RowDefinition/>
+                <RowDefinition/>
+                <RowDefinition/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+            <Button Margin="10" Height="20" Width="20" Background="White"/>
+            <Button Grid.Row="1"  Height="20" Width="20" Background="White"/>
+            <Button Grid.Row="2"  Height="20" Width="20" Background="White"/>
+            <Button Grid.Row="3"  Height="20" Width="20" Background="White"/>
+        </Grid>
+        <Grid Grid.Column="1" Name="PIDControlGrid" Margin="15" HorizontalAlignment="Left" Visibility="Visible">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition/>
                 <ColumnDefinition/>
@@ -33,28 +39,64 @@
                 <RowDefinition/>
                 <RowDefinition/>
                 <RowDefinition/>
+                <RowDefinition/>
+                <RowDefinition/>
             </Grid.RowDefinitions>
+            <TextBlock Text="soort regelaar" FontSize="15" Foreground="White"/>
+            <TextBlock Grid.Column="1" HorizontalAlignment="Center" Text="geschakeld" FontSize="15" Foreground="White"/>
+            
+            <ComboBox Grid.Row="1" Name="SoortRegelaarCMB" Width="70" Height="20">
+                <ComboBoxItem Content="PID"/>
+            </ComboBox>
+            <ComboBox Grid.Row="1" Grid.Column="1" HorizontalAlignment="Center" Name="GeschakeldCMB" Height="20" Width="150">
+                <ComboBoxItem Content="Parallel"/>
+                <ComboBoxItem Content="Serieel"/>
+            </ComboBox>
+            <TextBlock Grid.Row="2" Text="Wenswaarde  " FontSize="15" Foreground="White"/>
+                <Slider Name="WensWaardeSlider" Grid.Row="2" Grid.Column="1" Minimum="0" Maximum="100" Width="200"/>
 
-                <TextBlock Text="Wenswaarde  " FontSize="15" Foreground="White"/>
-                <Slider Grid.Column="1" Minimum="0" Maximum="100" Width="200"/>
+                <TextBlock Grid.Row="3" Text="P-actie  " FontSize="15" Foreground="White"/>
+                <Slider Name="PactieSlider" Grid.Row="3" Grid.Column="1" Minimum="0" Maximum="100" Width="200"/>
 
-                <TextBlock Grid.Row="1" Text="P-actie  " FontSize="15" Foreground="White"/>
-                <Slider Grid.Row="1" Grid.Column="1" Minimum="0" Maximum="100" Width="200"/>
+                <TextBlock Grid.Row="4" Text="I-actie  " FontSize="15" Foreground="White"/>
+                <Slider Name="IactieSlider" Grid.Row="4" Grid.Column="1" Minimum="0" Maximum="100" Width="200"/>
 
-                <TextBlock Grid.Row="2" Text="I-actie  " FontSize="15" Foreground="White"/>
-                <Slider Grid.Row="2" Grid.Column="1" Minimum="0" Maximum="100" Width="200"/>
+                <TextBlock Grid.Row="5" Text="D-actie  " FontSize="15" Foreground="White"/>
+                <Slider Name="DactieSlider" Grid.Row="5" Grid.Column="1" Minimum="0" Maximum="100" Width="200"/>
 
-                <TextBlock Grid.Row="3" Text="D-actie  " FontSize="15" Foreground="White"/>
-                <Slider Grid.Row="3" Grid.Column="1" Minimum="0" Maximum="100" Width="200"/>
-
-                <TextBlock Grid.Row="4" Text="Dfilter  " FontSize="15" Foreground="White"/>
-            <Slider Grid.Row="4" Grid.Column="1" Minimum="0" Maximum="100" Width="200"/>
+                <TextBlock Grid.Row="6" Text="Dfilter  " FontSize="15" Foreground="White"/>
+            <Slider Name="DfilterSlider" Grid.Row="6" Grid.Column="1" Minimum="0" Maximum="100" Width="200"/>
         </Grid>
+        <Grid x:Name="ProcesGrid" Grid.Row="1" Grid.Column="1" Margin="10" HorizontalAlignment="Left" Visibility="Visible">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition/>
+                <RowDefinition/>
+                <RowDefinition/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+            <TextBlock Text="ProcesKracht   " FontSize="15" Foreground="White"/>
+            <Slider Grid.Column="1" Name="ProcesKrachtSlider" Minimum="0" Maximum="5" Width="200"/>
+            <TextBlock Grid.Row="1" Text="proces orde" FontSize="15" Foreground="White"/>
+            <ComboBox Name="ProcesOrdeCMB" Grid.Row="1" Grid.Column="1" Height="20" Width="100" HorizontalAlignment="Left" VerticalAlignment="Top">
+                <ComboBoxItem Content="0de orde"/>
+                <ComboBoxItem Content="1ste orde"/>
+                <ComboBoxItem Content="2de orde"/>
+            </ComboBox>
+            <TextBlock Grid.Row="2" Text="snelheid" FontSize="15" Foreground="White"/>
+            <Slider Grid.Row="2" Grid.Column="1" Name="TijdsConstanteSlider" Minimum="0" Maximum="5" Width="200"/>
+            <Button x:Name="StartBtn" Grid.Row="3" Content="Start" Height="20" Width="50" HorizontalAlignment="Left"/>
+            <Button Name="StopBtn" Grid.Row="3" Grid.Column="1" Content="Stop" Height="20" Width="50" HorizontalAlignment="Left"/>
+            <Button Name="Pausebtn" Grid.Row="3" Grid.Column="1" Content="Pauze" Height="20" Width="50" HorizontalAlignment="Center"/>
+        </Grid> 
         <StackPanel Name="SerialStackPanel" Grid.Column="1" HorizontalAlignment="Center" Visibility="Hidden">
             <TextBlock Text="SerialComunication" FontSize="15" Foreground="White" Margin="0,0,0,20" HorizontalAlignment="Center"/>
             <WrapPanel HorizontalAlignment="Center">
                 <TextBlock Text="auto connect" FontSize="15" Foreground="White"/>
-                <CheckBox IsChecked="True" Margin="5,4"/>
+                <CheckBox Name="AutoSerialCKB" IsChecked="True" Margin="5,4"/>
             </WrapPanel>
             <ComboBox Name="SerialSelectionCbm"/>
             <WrapPanel>
@@ -62,5 +104,9 @@
                 <Button Content="disconnect" Name="SerialDisconectBtn" Height="20" Width="60" Margin="10"/>
             </WrapPanel>
         </StackPanel>
+
+        <Grid Name="GraphGrid" Grid.Row="1" Grid.Column="2" Margin="10" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+            <Canvas Name="GraphCanvas" Background="Black"/>
+        </Grid>
     </Grid>
 </Window>
