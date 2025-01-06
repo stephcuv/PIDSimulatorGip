@@ -13,7 +13,7 @@ namespace PIDSimulatorGip.model
         private bool _krachtBerState;
         private double _w;
 
-        private byte _dodeTijd; //dodentijd enkel voor simulator
+        private byte _dodeTijd = 1; 
         private double T = 0;
         private double _tijdsconstante;
         private double _procesVerschil = 0;
