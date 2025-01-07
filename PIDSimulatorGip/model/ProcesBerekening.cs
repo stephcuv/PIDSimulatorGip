@@ -13,12 +13,12 @@ namespace PIDSimulatorGip.model
         private bool _krachtBerState;
         private double _w;
 
-        private byte _dodeTijd = 1; 
+        private byte _dodeTijd; //dodentijd enkel voor simulator
         private double T = 0;
         private double _tijdsconstante;
         private double _procesVerschil = 0;
 
-        private List<double> _procesUitkomsten = new List<double>();
+        private double[] _procesUitkomsten;
         private double _prevProcesUitkomst = 0;
 
         #region public variables for instance variables
@@ -77,6 +77,7 @@ namespace PIDSimulatorGip.model
                         _dodeTijd = 6;
                         break;
                 }
+                _procesUitkomsten = new double[_dodeTijd];
             }
         }
         public double Tijdsconstante
@@ -94,22 +95,19 @@ namespace PIDSimulatorGip.model
         #region functions for adding or removing in _procesUitkomsten list
         private void add(double temp)
         {
-            _procesUitkomsten.Add(temp);
+            for (int i = _dodeTijd - 1; i > 0; i--)
+            {
+                _procesUitkomsten[i] = _procesUitkomsten[i - 1];
+            }
+            _procesUitkomsten[0] = temp;
         }
 
-        private void RemoveCheck()
-        {
-            if (_procesUitkomsten.Count > _dodeTijd)
-            {
-                _procesUitkomsten.RemoveAt(0);
-            }
-        }
         #endregion
 
         public double Proces(double Y)
         {
             double X = 0;
-            if (Y == 0)
+            if (Y == _w)
             {
                 _procesVerschil = 0;
                 X = ProcesKrachtGelijk();
@@ -124,10 +122,9 @@ namespace PIDSimulatorGip.model
                 _procesVerschil = _prevProcesUitkomst - Y;
                 X = ProcesKrachtDalend();
             }
-            double temp = Math.Round(X, 2);
-            add(temp);
-            RemoveCheck();
-            return _procesUitkomsten.ElementAt(0);
+            double value = Math.Round(X, 4);
+            add(value);
+            return _procesUitkomsten[_dodeTijd - 1];
         }
 
         #region functions proces kracht berekeningen
@@ -148,7 +145,8 @@ namespace PIDSimulatorGip.model
         {
             _krachtBerState = true;
             double _procesUitkomst = 0;
-            double e = Math.Pow(Math.E, -T / (1 * Kracht));
+            double b = -T / Kracht;
+            double e = Math.Pow(Math.E, b);
             switch (Orde)
             {
                 case "0orde":
@@ -174,7 +172,8 @@ namespace PIDSimulatorGip.model
         {
             _krachtBerState = false;
             double _procesUitkomst = 0;
-            double e = Math.Pow(Math.E, -T / (1 * Kracht));
+            double b = -T / Kracht;
+            double e = Math.Pow(Math.E, b);
             switch (Orde)
             {
                 case "0orde":

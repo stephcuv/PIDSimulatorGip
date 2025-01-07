@@ -27,25 +27,47 @@ namespace PIDSimulatorGip.model
 
         public double DFilter
         {
+            get { return _dFilter; }
             set { _dFilter = value; }
         }
         public double Tijdsconstante
         {
+            get { return _tijdsconstante; }
             set { _tijdsconstante = value; }
         }
         internal double X //gemeten waarde
         {
-            set { _x = value; }
+            get
+            {
+                return _x;
+            }
+
+            set
+            {
+                _x = value;
+            }
         }
 
         internal double W //wenswaarde 
         {
-            get { return _w; }
-            set { _w = value; }
+            get
+            {
+                return _w;
+            }
+
+            set
+            {
+                _w = value;
+            }
         }
 
         internal double VSFP //versteringsfactor voor de P - regelaar
         {
+            get
+            {
+                return _vsfP;
+            }
+
             set
             {
                 if (value >= 0 && _vsfP != value)
@@ -57,6 +79,11 @@ namespace PIDSimulatorGip.model
 
         internal double VSFI //versterkingsfactor voor de I - regelaar
         {
+            get
+            {
+                return _vsfI;
+            }
+
             set
             {
                 if (value >= 0 && _vsfI != value)
@@ -68,6 +95,10 @@ namespace PIDSimulatorGip.model
 
         internal double VSFD //versterkingsfactor voor de D - regelaar
         {
+            get
+            {
+                return _vsfD;
+            }
             set
             {
                 if (value > 0 && _vsfD != value)
@@ -101,13 +132,15 @@ namespace PIDSimulatorGip.model
         internal double IRegelaar(bool Geschakeld, bool First, double Waarde)
         {
             double berekening;
+
+
             if ((Geschakeld && First) || !Geschakeld)
             {
-                berekening = _prevIWaarde + _vsfI * Fout() * _t;
+                berekening = _prevIWaarde + VSFI * Fout() * _tijdsconstante;
             }
             else
             {
-                berekening = _prevIWaarde + _vsfI * Waarde * _t;
+                berekening = _prevIWaarde + VSFI * Waarde * _tijdsconstante;
             }
             berekening = Math.Round(berekening, 4);
             _prevIWaarde = berekening;
@@ -151,9 +184,10 @@ namespace PIDSimulatorGip.model
             return _w - _x;
         }
         //zal kijken hoeveel tijd er is verstreken. 
-        public void EllapsedTime()
+        public double EllapsedTime()
         {
             _t += _tijdsconstante;
+            return _t;
         }
     }
 }

@@ -39,7 +39,10 @@ namespace PIDSimulatorGip.model
         }
         public double Tijdsconstante
         {
-            get { return _tijdsconstante; }
+            get
+            {
+                return _tijdsconstante;
+            }
             set
             {
                 if (value > 0)
@@ -51,7 +54,10 @@ namespace PIDSimulatorGip.model
 
         public string Regelaar
         {
-            get { return _regelaar; }
+            get
+            {
+                return _regelaar;
+            }
             set
             {
                 if (!string.IsNullOrEmpty(value))
@@ -64,7 +70,10 @@ namespace PIDSimulatorGip.model
         //kan serieel of parallel zijn. 
         public string Geschakeld
         {
-            get { return _geschakeld; }
+            get
+            {
+                return _geschakeld;
+            }
             set
             {
                 if (!string.IsNullOrEmpty(value))
@@ -76,7 +85,10 @@ namespace PIDSimulatorGip.model
 
         public double Y
         {
-            get { return _y; }
+            get
+            {
+                return _y;
+            }
             private set
             {
                 _y = value;
@@ -84,7 +96,14 @@ namespace PIDSimulatorGip.model
         }
         public double X
         {
-            set { PIDBerekeningen.X = value; }
+            get
+            {
+                return PIDBerekeningen.X;
+            }
+            set
+            {
+                PIDBerekeningen.X = value;
+            }
         }
         public double W
         {
@@ -109,6 +128,10 @@ namespace PIDSimulatorGip.model
 
         public double VSFP
         {
+            get
+            {
+                return PIDBerekeningen.VSFP;
+            }
             set
             {
                 if (value > 0)
@@ -119,6 +142,10 @@ namespace PIDSimulatorGip.model
         }
         public double VSFI
         {
+            get
+            {
+                return PIDBerekeningen.VSFI;
+            }
             set
             {
                 if (value > 0)
@@ -129,6 +156,10 @@ namespace PIDSimulatorGip.model
         }
         public double VSFD
         {
+            get
+            {
+                return PIDBerekeningen.VSFD;
+            }
             set
             {
                 if (value > 0)
@@ -153,6 +184,7 @@ namespace PIDSimulatorGip.model
                     break;
 
                 case "PI":
+                    PIDBerekeningen.Tijdsconstante = Tijdsconstante;
                     _pWaarde = PIDBerekeningen.PRegelaar(false, false, 0);
                     _iWaarde = PIDBerekeningen.IRegelaar(false, false, 0);
                     outcome = _pWaarde + _iWaarde;
@@ -169,6 +201,7 @@ namespace PIDSimulatorGip.model
                 case "PID":
                     PIDBerekeningen.Tijdsconstante = Tijdsconstante;
                     PIDBerekeningen.DFilter = Dfilter;
+
                     _pWaarde = PIDBerekeningen.PRegelaar(false, false, 0);
                     _iWaarde = PIDBerekeningen.IRegelaar(false, false, 0);
                     _dWaarde = PIDBerekeningen.DRegelaar(false, false, 0);
