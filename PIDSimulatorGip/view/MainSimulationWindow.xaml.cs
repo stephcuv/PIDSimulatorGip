@@ -46,21 +46,16 @@
                 this.DataContext = this;
             }
 
-            #region EventHandlers
-            #region PIDControlEventHandlers
-            private void SoortRegelaarCMB_SelectionChanged(object sender, SelectionChangedEventArgs e)
-            {
-                string ?temp = SoortRegelaarCMB.SelectedItem.ToString();
-                RGLR.Regelaar = temp;
-            }
+        #region EventHandlers
+        #region PIDControlEventHandlers
 
-            private void GeschakeldCMB_SelectionChanged(object sender, SelectionChangedEventArgs e)
-            {
-                string? temp = GeschakeldCMB.SelectedItem.ToString();
-                RGLR.Geschakeld = temp;
-            }
+        private void TypeCMB_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            string? temp = TypeCMB.SelectedItem.ToString();
+            RGLR.Type = temp;
+        }
 
-            private void WensWaardeSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        private void WensWaardeSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
             {
                 double temp = Convert.ToDouble(WensWaardeSlider.Value);
                 RGLR.W = temp;
@@ -83,10 +78,6 @@
                 RGLR.VSFD = Convert.ToDouble(DactieSlider.Value);
             }
 
-            private void DfilterSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
-            {
-                RGLR.Dfilter = Convert.ToDouble(DfilterSlider.Value);   
-            }
             #endregion
             #region PIDProcesEventHandlers
             private void ProcesKrachtSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
@@ -119,8 +110,7 @@
                     PauseBtn.IsEnabled = true;
 
                     StartBtn.IsEnabled = false;
-                    SoortRegelaarCMB.IsEnabled = false;
-                    GeschakeldCMB.IsEnabled = false;
+                    TypeCMB.IsEnabled = false;
                     ProcesKrachtSlider.IsEnabled = false;
                     ProcesOrdeCMB.IsEnabled = false;
                     _run = true;
@@ -134,8 +124,7 @@
                 PauseBtn.IsEnabled = false;
 
                 StartBtn.IsEnabled = true;
-                SoortRegelaarCMB.IsEnabled = true;
-                GeschakeldCMB.IsEnabled = true;
+                TypeCMB.IsEnabled = true;
                 ProcesKrachtSlider.IsEnabled = true;
                 ProcesOrdeCMB.IsEnabled = true;
             }
@@ -263,13 +252,9 @@
             }
             private void MainWindow_Loaded(object sender, RoutedEventArgs e)
             {
-                SoortRegelaarCMB.Items.Add("P");
-                SoortRegelaarCMB.Items.Add("I");
-                SoortRegelaarCMB.Items.Add("PI");
-                SoortRegelaarCMB.Items.Add("PD");
-                SoortRegelaarCMB.Items.Add("PID");
-                GeschakeldCMB.Items.Add("Parallel");
-                GeschakeldCMB.Items.Add("Serieel");
+                TypeCMB.Items.Add("Type A");
+                TypeCMB.Items.Add("Type B");
+                TypeCMB.Items.Add("Type C");
                 ProcesOrdeCMB.Items.Add("1orde");
                 ProcesOrdeCMB.Items.Add("2orde");
                 DodetijdCMB.Items.Add("geen dodetijd");
@@ -296,6 +281,6 @@
                 Dispatcher.BeginInvoke(new Action(UpdateGraph));
             }
 
-            #endregion
-        }
+        #endregion
     }
+}

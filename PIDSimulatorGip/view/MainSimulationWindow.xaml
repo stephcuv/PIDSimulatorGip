@@ -47,11 +47,10 @@
                 <RowDefinition/>
                 <RowDefinition/>
             </Grid.RowDefinitions>
-            <TextBlock Text="soort regelaar" FontSize="15" Foreground="White"/>
-            <TextBlock Grid.Column="1" HorizontalAlignment="Center" Text="geschakeld" FontSize="15" Foreground="White"/>
 
-            <ComboBox Grid.Row="1" Name="SoortRegelaarCMB" Width="70" Height="20" SelectionChanged="SoortRegelaarCMB_SelectionChanged"/>    
-            <ComboBox Grid.Row="1" Grid.Column="1" HorizontalAlignment="Center" Name="GeschakeldCMB" Height="20" Width="150" SelectionChanged="GeschakeldCMB_SelectionChanged"/>
+            <TextBlock Grid.Column="1" HorizontalAlignment="Center" Text="type" FontSize="15" Foreground="White"/>
+            <ComboBox Grid.Row="1" Grid.Column="1" HorizontalAlignment="Center" Name="TypeCMB" Height="20" Width="150" SelectionChanged="TypeCMB_SelectionChanged"/>
+            
             <TextBlock Grid.Row="2" Text="Wenswaarde  " FontSize="15" Foreground="White"/>
             <Slider Name="WensWaardeSlider" Grid.Row="2" Grid.Column="1" Minimum="0" Maximum="100" Width="200" ValueChanged="WensWaardeSlider_ValueChanged"/>
             <TextBlock x:Name="WensWaardeTB" Grid.Row="2" Grid.Column="2" FontSize="15" Foreground="White"  Text="{Binding ElementName=WensWaardeSlider, Path=Value,  StringFormat={}{0:F2}}"/>
@@ -69,9 +68,6 @@
             <TextBlock Name="DactieTB" Grid.Row="5" Grid.Column="2" FontSize="15" Foreground="White" Text="{Binding ElementName=DactieSlider, Path=Value,  StringFormat={}{0:F2}}"/>
 
 
-            <TextBlock Grid.Row="6" Text="Dfilter  " FontSize="15" Foreground="White"/>
-            <Slider Name="DfilterSlider" Grid.Row="6" Grid.Column="1" Minimum="0" Maximum="1" Width="200" ValueChanged="DfilterSlider_ValueChanged"/>
-            <TextBlock Name="DfilterTB" Grid.Row="6" Grid.Column="2" FontSize="15" Foreground="White" Text="{Binding ElementName=DfilterSlider, Path=Value, StringFormat={}{0:F2}}"/>
         </Grid>
         <!--#endregion-->
         <!--#region proces grid -->
