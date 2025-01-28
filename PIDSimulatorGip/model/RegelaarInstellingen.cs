@@ -48,6 +48,7 @@ namespace PIDSimulatorGip.model
         }
         public double Tijdsconstante
         {
+            get {return _tijdsconstante;}
             set { if (value > 0) { _tijdsconstante = value; } }
         }
 
