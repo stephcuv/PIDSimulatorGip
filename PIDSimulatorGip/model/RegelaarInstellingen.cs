@@ -14,11 +14,11 @@ namespace PIDSimulatorGip.model
         private double _y;
         private double _w;
 
-        private double _vsfP = 1;
+        private double _vsfP;
 
-        private double _vsfI = 1;
+        private double _vsfI;
 
-        private double _vsfD = 1;
+        private double _vsfD;
 
         private double _tijdsconstante;
 
@@ -62,7 +62,8 @@ namespace PIDSimulatorGip.model
             {
                 if (!string.IsNullOrEmpty(value))
                 {
-                    _type = value;
+                    string result = value.Substring(value.IndexOf(":") + 2);
+                    _type = result;
                 }
             }
         }
@@ -86,7 +87,7 @@ namespace PIDSimulatorGip.model
             }
             set
             {
-                ArrayAddMeetW(value);
+                ArrayAdd(_meetWaardes, value);
             }
         }
         public double W
@@ -154,11 +155,11 @@ namespace PIDSimulatorGip.model
             switch (_type)
             {
                 case "Type A":
-                    ArrayAddFout(Fout());
+                    ArrayAdd(_foutWaardes, Fout()); 
                     TypeA();
                     break;
                 case "Type B":
-                    ArrayAddFout(Fout());
+                    ArrayAdd(_foutWaardes, Fout());
                     TypeB();
                     break;
                 case "Type C":
@@ -190,7 +191,16 @@ namespace PIDSimulatorGip.model
             _iWaarde = _vsfI * _foutWaardes[0] * _tijdsconstante;
             _dWaarde = (_vsfD / _tijdsconstante) * (_foutWaardes[0] - (2 * _foutWaardes[1]) + _foutWaardes[2]);
 
-            Y = _prevStuurWaarde + _pWaarde + _iWaarde + _dWaarde;
+            double temp = _prevStuurWaarde + _pWaarde + _iWaarde + _dWaarde;
+            if(temp < 0)
+            {
+                temp = 0;
+            }
+            else if(temp > 100)
+            {
+                temp = 100;
+            }
+            Y = temp;
         }
 
         private void TypeB()
@@ -200,7 +210,16 @@ namespace PIDSimulatorGip.model
             _dWaarde = (_vsfD / _tijdsconstante) * (_meetWaardes[0] - (2 * _meetWaardes[1]) + _meetWaardes[2]);
 
 
-            Y = _prevStuurWaarde + _pWaarde + _iWaarde - _dWaarde;
+            double temp = _prevStuurWaarde + _pWaarde + _iWaarde - _dWaarde;
+            if (temp < 0)
+            {
+                temp = 0;
+            }
+            else if (temp > 100)
+            {
+                temp = 100;
+            }
+            Y = temp;
         }
 
         private void TypeC()
@@ -210,7 +229,16 @@ namespace PIDSimulatorGip.model
             _dWaarde = (_vsfD / _tijdsconstante) * (_meetWaardes[0] - (2 * _meetWaardes[1]) + _meetWaardes[2]);
 
 
-            Y = _prevStuurWaarde + _pWaarde + _iWaarde - _dWaarde;
+            double temp = _prevStuurWaarde + _pWaarde + _iWaarde - _dWaarde;
+            if (temp < 0)
+            {
+                temp = 0;
+            }
+            else if (temp > 100)
+            {
+                temp = 100;
+            }
+            Y = temp;
         }
 
         private double Fout()
@@ -219,23 +247,15 @@ namespace PIDSimulatorGip.model
         }
         #endregion
 
-
         #region arrayAddFunctions
-        private void ArrayAddFout(double waarde)
+
+        private void ArrayAdd(double[] array, double value)
         {
-            for (int i = 2; i > 0; i--)
+            for (int i = array.Length - 1; i > 0; i--)
             {
-                _foutWaardes[i] = _foutWaardes[i - 1];
+                array[i] = array[i - 1];
             }
-            _foutWaardes[0] = waarde;
-        }
-        private void ArrayAddMeetW(double waarde)
-        {
-            for (int i = 2; i > 0; i--)
-            {
-                _meetWaardes[i] = _meetWaardes[i - 1];
-            }
-            _meetWaardes[0] = waarde;
+            array[0] = value;
         }
         #endregion
 
