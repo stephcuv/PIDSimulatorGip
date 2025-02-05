@@ -49,27 +49,27 @@
             </Grid.RowDefinitions>
 
             <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Text="type" FontSize="15" Foreground="White"/>
-            <ComboBox Grid.Column="1" HorizontalAlignment="Center" Name="TypeCMB" Height="20" Width="150">
+            <ComboBox Grid.Column="1" HorizontalAlignment="Center" Name="TypeCMB" IsEnabled="{Binding IsRunning}" Height="20" Width="150" SelectedValue="{Binding Type, Mode=TwoWay}">
                 <ComboBoxItem Content="Type A"/>
                 <ComboBoxItem Content="Type B"/>
                 <ComboBoxItem Content="Type C"/>
             </ComboBox>
 
             <TextBlock Grid.Row="1" Text="Wenswaarde  " FontSize="15" Foreground="White"/>
-            <Slider Name="WensWaardeSlider" Grid.Row="1" Grid.Column="1" Minimum="0" Maximum="100" Width="200" Value="{Binding W, UpdateSourceTrigger=PropertyChanged}"/>
-            <TextBlock x:Name="WensWaardeTB" Grid.Row="1" Grid.Column="2" FontSize="15" Foreground="White" Text="{Binding W, UpdateSourceTrigger=PropertyChanged, StringFormat=F2}"/>
+            <Slider Name="WensWaardeSlider" Grid.Row="1" Grid.Column="1" Minimum="0" Maximum="100" Width="200" Value="{Binding W, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+            <TextBlock x:Name="WensWaardeTB" Grid.Row="1" Grid.Column="2" FontSize="15" Foreground="White" Text="{Binding W, UpdateSourceTrigger=PropertyChanged, StringFormat=F2, Mode=TwoWay}"/>
 
             <TextBlock Grid.Row="2" Text="P-actie  " FontSize="15" Foreground="White"/>
-            <Slider Name="PactieSlider" Grid.Row="2" Grid.Column="1" Minimum="0" Maximum="5" Width="200" Value="{Binding VSFP, UpdateSourceTrigger=PropertyChanged}"/>
-            <TextBlock Name="PactieTB" Grid.Row="2" Grid.Column="2" FontSize="15" Foreground="White" Text="{Binding VSFP, UpdateSourceTrigger=PropertyChanged, StringFormat=F3}"/>
+            <Slider Name="PactieSlider" Grid.Row="2" Grid.Column="1" Minimum="0" Maximum="5" Width="200" Value="{Binding VSFP, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+            <TextBlock Name="PactieTB" Grid.Row="2" Grid.Column="2" FontSize="15" Foreground="White" Text="{Binding VSFP, UpdateSourceTrigger=PropertyChanged, StringFormat=F3, Mode=TwoWay}"/>
 
             <TextBlock Grid.Row="3" Text="I-actie  " FontSize="15" Foreground="White"/>
-            <Slider Name="IactieSlider" Grid.Row="3" Grid.Column="1" Minimum="0" Maximum="1" Width="200" Value="{Binding VSFI, UpdateSourceTrigger=PropertyChanged}"/>
-            <TextBlock Name="IactieTB" Grid.Row="3" Grid.Column="2" FontSize="15" Foreground="White" Text="{Binding VSFI, UpdateSourceTrigger=PropertyChanged, StringFormat=F3}"/>
+            <Slider Name="IactieSlider" Grid.Row="3" Grid.Column="1" Minimum="0" Maximum="1" Width="200" Value="{Binding VSFI, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+            <TextBlock Name="IactieTB" Grid.Row="3" Grid.Column="2" FontSize="15" Foreground="White" Text="{Binding VSFI, UpdateSourceTrigger=PropertyChanged, StringFormat=F3, Mode=TwoWay}"/>
 
             <TextBlock Grid.Row="4" Text="D-actie  " FontSize="15" Foreground="White"/>
-            <Slider Name="DactieSlider" Grid.Row="4" Grid.Column="1" Minimum="0" Maximum="5" Width="200" Value="{Binding VSFD, UpdateSourceTrigger=PropertyChanged}"/>
-            <TextBlock Name="DactieTB" Grid.Row="4" Grid.Column="2" FontSize="15" Foreground="White"  Text="{Binding VSFD, UpdateSourceTrigger=PropertyChanged, StringFormat=F3}"/>
+            <Slider Name="DactieSlider" Grid.Row="4" Grid.Column="1" Minimum="0" Maximum="5" Width="200" Value="{Binding VSFD, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+            <TextBlock Name="DactieTB" Grid.Row="4" Grid.Column="2" FontSize="15" Foreground="White"  Text="{Binding VSFD, UpdateSourceTrigger=PropertyChanged, StringFormat=F3, Mode=TwoWay}"/>
 
 
         </Grid>
@@ -91,18 +91,18 @@
                 <RowDefinition/>
             </Grid.RowDefinitions>
             <TextBlock Text="ProcesKracht   " FontSize="15" Foreground="White"/>
-            <Slider Grid.Column="1" Name="ProcesKrachtSlider" Grid.ColumnSpan="2" Minimum="0" Maximum="5" Width="200" Value="{Binding Kracht, UpdateSourceTrigger=PropertyChanged}"/>
-            <TextBlock Grid.Column="3" FontSize="15" Foreground="White" Text="{Binding Kracht, UpdateSourceTrigger=PropertyChanged, StringFormat=F2}"/>
+            <Slider Grid.Column="1" Name="ProcesKrachtSlider" Grid.ColumnSpan="2" Minimum="0" Maximum="5" Width="200" IsEnabled="{Binding IsRunning}" Value="{Binding Kracht, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+            <TextBlock Grid.Column="3" FontSize="15" Foreground="White" Text="{Binding Kracht, UpdateSourceTrigger=PropertyChanged, StringFormat=F2, Mode=TwoWay}"/>
 
             <TextBlock Grid.Row="1" Text="proces orde" FontSize="15" Foreground="White"/>
-            <ComboBox Name="ProcesOrdeCMB" Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" Height="20" Width="100" HorizontalAlignment="Left" VerticalAlignment="Top" SelectedItem="{Binding Orde}">
+            <ComboBox Name="ProcesOrdeCMB" Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" Height="20" Width="100" HorizontalAlignment="Left" VerticalAlignment="Top" IsEnabled="{Binding IsRunning}" SelectedValue="{Binding Orde, Mode=TwoWay}">
                 <ComboBoxItem Content="0orde"/>
                 <ComboBoxItem Content="1orde"/>
                 <ComboBoxItem Content="2orde"/>
             </ComboBox>
 
             <TextBlock Text="dodetijd" FontSize="15" Foreground="White" Grid.Row="2"/>
-            <ComboBox Name="DodetijdCMB" Height="20" Width="150" Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="2" HorizontalAlignment="Left" VerticalAlignment="Top" SelectedItem="{Binding DodeTijd}">
+            <ComboBox Name="DodetijdCMB" Height="20" Width="150" Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="2" HorizontalAlignment="Left" VerticalAlignment="Top" IsEnabled="{Binding IsRunning}" SelectedValue="{Binding DodeTijd, Mode=TwoWay}">
                 <ComboBoxItem Content="geen dodetijd"/>
                 <ComboBoxItem Content="klein beetje dodetijd"/>
                 <ComboBoxItem Content="wat dodetijd"/>
@@ -112,17 +112,17 @@
             </ComboBox>
 
             <TextBlock Grid.Row="3" Text="tijdsconstante" FontSize="15" Foreground="White"/>
-            <Slider Grid.Row="3" Grid.Column="1" Grid.ColumnSpan="2" Name="TijdsConstanteSlider" Minimum="0" Maximum="5" Width="200" Value="{Binding TijdsConstante, UpdateSourceTrigger=PropertyChanged}"/>
-            <TextBlock Name="TijdsConstanteTB" Grid.Row="3" Grid.Column="3" FontSize="15" Foreground="White"  HorizontalAlignment="Right" Text="{Binding TijdsConstante, UpdateSourceTrigger=PropertyChanged, StringFormat=F2}"/>
+            <Slider Name="TijdsConstanteSlider" Grid.Row="3" Grid.Column="1" Grid.ColumnSpan="2"  Minimum="0" Maximum="5" Width="200" IsEnabled="{Binding IsRunning}" Value="{Binding TijdsConstante, UpdateSourceTrigger=PropertyChanged}"/>
+            <TextBlock Name="TijdsConstanteTB" Grid.Row="3" Grid.Column="3" FontSize="15" Foreground="White"  HorizontalAlignment="Right" Text="{Binding TijdsConstante, UpdateSourceTrigger=PropertyChanged, StringFormat=F2, Mode=TwoWay}"/>
 
-            <TextBlock Grid.Row="4" FontSize="15" Foreground="White" Text="simulation speed  "/>
-            <Slider Name="SimulatieSnelheidSlider" Grid.Row="4" Grid.Column="1" Grid.ColumnSpan="2" Minimum="0.5" Maximum="4" Value="{Binding SimulatieSnelheid,  UpdateSourceTrigger=PropertyChanged}"/>
+            <TextBlock Grid.Row="4" FontSize="15" Foreground="White" Text="simulatie snelheid  "/>
+            <Slider Name="SimulatieSnelheidSlider" Grid.Row="4" Grid.Column="1" Grid.ColumnSpan="2" Minimum="0.5" Maximum="10" IsEnabled="{Binding IsRunning}" Value="{Binding SimulatieSnelheid,  UpdateSourceTrigger=PropertyChanged}"/>
             <TextBlock Name="SimulatieSnelheidTB" Grid.Row="4" Grid.Column="3" FontSize="15" Foreground="White" Text="{Binding SimulatieSnelheid, UpdateSourceTrigger=PropertyChanged, StringFormat=F2}"/>
 
 
             <Button x:Name="StartBtn" Grid.Row="5" Content="Start" Height="20" Width="50" Command="{Binding StartCommand}"/>
-            <Button Name="StopBtn" Grid.Row="5" Grid.Column="1" Content="Stop" Height="20" Width="50" Command="{Binding StopCommand}"/>
-            <Button Name="PauseBtn" Grid.Row="5" Grid.Column="2" Content="Pauze" Height="20" Width="50" HorizontalAlignment="Center" Command="{Binding PauzeCommand}"/>
+            <Button Name="StopBtn" Grid.Row="5" Grid.Column="2" Content="reset" Height="20" Width="50" Command="{Binding ResetCommand}"/>
+            <Button Name="PauseBtn" Grid.Row="5" Grid.Column="1" Content="Pauze" Height="20" Width="50" HorizontalAlignment="Center" Command="{Binding PauzeCommand}"/>
         </Grid>
         <!--#endregion-->
         <!--#region serial connection grid -->
@@ -145,23 +145,41 @@
         </Grid>
         <!--#endregion-->
         <!--#region animation-->
-        <Grid Name="AnimationGrid" Grid.Column="2" Margin="10">
+        <Grid Name="AnimationGrid" Grid.Column="2" Margin="10"
+      VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
+
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
 
-            <Grid Name="WaterTankAnimation" Visibility="Visible">
+            <!-- Centered WaterTankAnimation -->
+            <Grid Name="WaterTankAnimation" Grid.Row="1" Grid.Column="1"
+          VerticalAlignment="Center" HorizontalAlignment="Center"
+          Visibility="Visible">
+
                 <!-- Water Tank Container -->
-                <Border BorderBrush="Black" BorderThickness="2" CornerRadius="5" VerticalAlignment="Bottom" HorizontalAlignment="Center" Width="300" Height="300" Background="LightGray">
+                <Border BorderBrush="Black" BorderThickness="2" CornerRadius="5"
+                Width="300" Height="300" Background="LightGray"
+                VerticalAlignment="Center" HorizontalAlignment="Center">
+
                     <!-- Water Level -->
-                    <Grid VerticalAlignment="Bottom" Margin="5">
-                        <Rectangle Name="WaterRectangle" Fill="LightBlue" VerticalAlignment="Bottom" Height="{Binding }"/>
+                    <Grid VerticalAlignment="Bottom" HorizontalAlignment="Stretch" Margin="5">
+                        <Rectangle Name="WaterRectangle" Fill="LightBlue"
+                           VerticalAlignment="Bottom" HorizontalAlignment="Stretch"
+                           Height="{Binding ProcesWaarde}"/>
                     </Grid>
                 </Border>
             </Grid>
         </Grid>
+
         <!--#endregion-->
     </Grid>
 </Window>

@@ -9,7 +9,7 @@ namespace PIDSimulatorGip.model
     class RegelaarInstellingen
     {
         #region variabelen
-        private string _type = "Type C";
+        private string _type;
 
         private double _y;
         private double _w;
@@ -49,7 +49,7 @@ namespace PIDSimulatorGip.model
         public double Tijdsconstante
         {
             get {return _tijdsconstante;}
-            set { if (value > 0) { _tijdsconstante = value; } }
+            set { if (value >= 0) { _tijdsconstante = value; } }
         }
 
         public string Type
@@ -113,7 +113,7 @@ namespace PIDSimulatorGip.model
             }
             set
             {
-                if (value > 0)
+                if (value >= 0)
                 {
                     _vsfP = value;
                 }
@@ -127,7 +127,7 @@ namespace PIDSimulatorGip.model
             }
             set
             {
-                if (value > 0)
+                if (value >= 0)
                 {
                     _vsfI = value;
                 }
@@ -141,7 +141,7 @@ namespace PIDSimulatorGip.model
             }
             set
             {
-                if (value > 0)
+                if (value >= 0)
                 {
                     _vsfD = value;
                 }
@@ -191,7 +191,7 @@ namespace PIDSimulatorGip.model
             _iWaarde = _vsfI * _foutWaardes[0] * _tijdsconstante;
             _dWaarde = (_vsfD / _tijdsconstante) * (_foutWaardes[0] - (2 * _foutWaardes[1]) + _foutWaardes[2]);
 
-            double temp = _prevStuurWaarde + _pWaarde + _iWaarde + _dWaarde;
+                double temp = _prevStuurWaarde + _pWaarde + _iWaarde + _dWaarde;
             if(temp < 0)
             {
                 temp = 0;

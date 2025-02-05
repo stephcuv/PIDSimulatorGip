@@ -50,15 +50,22 @@ namespace PIDSimulatorGip.model
             }
             set
             {
+                if (string.IsNullOrEmpty(value)) { return; }
                 string result = value.Substring(value.IndexOf(":") + 2);
                 _orde = result;
             }
+        }
+
+        public int DodeTijdNumber
+        {
+            get { return _dodeTijd; }
         }
         public string DodeTijd
         {
             get {return DodetijdChoice;}
             set
             {
+                if(string.IsNullOrEmpty(value)){return;}
                 DodetijdChoice = value.Substring(value.IndexOf(":") + 2);
                 switch (DodetijdChoice)
                 {
@@ -87,7 +94,7 @@ namespace PIDSimulatorGip.model
         public double Tijdsconstante
 
         {
-            set { if (value > 0) { _tijdsconstante = value; } }
+            set { if (value >= 0) { _tijdsconstante = value; } }
         }
 
         public double ProcesWaarde
@@ -115,17 +122,17 @@ namespace PIDSimulatorGip.model
             {
 
 
-                if (Y == _w)
+                if (Y == _procesUitkomsten[1])
                 {
                     _procesVerschil = 0;
                     X = ProcesKrachtGelijk();
                 }
-                else if (Y < _w)
+                else if (Y < _procesUitkomsten[1])
                 {
                     _procesVerschil = Y - _procesUitkomsten[1];
                     X = ProcesKrachtStijgend();
                 }
-                else if (Y > _w)
+                else if (Y > _procesUitkomsten[1])
                 {
                     _procesVerschil = _procesUitkomsten[1] - Y;
                     X = ProcesKrachtDalend();

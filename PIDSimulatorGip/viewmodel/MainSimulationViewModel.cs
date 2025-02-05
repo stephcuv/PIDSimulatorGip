@@ -6,6 +6,7 @@ using OxyPlot.Series;
 using System.Drawing;
 using System.Windows.Threading;
 using OxyPlot.Axes;
+using System.Windows.Media;
 
 namespace PIDSimulatorGip.viewmodel
 {
@@ -19,7 +20,6 @@ namespace PIDSimulatorGip.viewmodel
 
 
         private double _rglrWaarde = 0;
-
         private double _procesWaarde = 0;
 
 
@@ -45,43 +45,90 @@ namespace PIDSimulatorGip.viewmodel
 
             _timer.Tick += Timer_Tick;
         }
-        public RelayCommand StartCommand => new RelayCommand(execute => { StartSimulation(); });
-        public RelayCommand StopCommand => new RelayCommand(execute => { StopSimuation(); }, canExecute => { return _isRunning; });
+        public RelayCommand StartCommand => new RelayCommand(execute => { StartSimulation();}, canExecute => { return !_isRunning; });
+        public RelayCommand ResetCommand => new RelayCommand(execute => { ResetSimulation(); }, canExecute => { return _isRunning; });
         public RelayCommand PauzeCommand => new RelayCommand(exectue => { PauseSimulation(); }, canExecute => { return _isRunning; });
+
+
         public PlotModel MyPlot { get { return _myPlot; } set { _myPlot = value; OnPropertyChanged(); } }
+        public bool IsRunning { get {return !_isRunning; } set { _isRunning = value; OnPropertyChanged(); } }
+
         public double VSFP { get { return _RGLR.VSFP; } set { _RGLR.VSFP = Math.Round(value, 3); OnPropertyChanged(); } }
         public double VSFI { get { return _RGLR.VSFI; } set { _RGLR.VSFI = Math.Round(value, 3); OnPropertyChanged(); } }
         public double VSFD { get { return _RGLR.VSFD; } set { _RGLR.VSFD = Math.Round(value, 3); OnPropertyChanged(); } }
         public double W { get { return _RGLR.W; } set { _RGLR.W = Math.Round(value, 2); _proces.W = Math.Round(value, 2); OnPropertyChanged(); } }
         public double TijdsConstante { set { _RGLR.Tijdsconstante = Math.Round(value, 2); _proces.Tijdsconstante = Math.Round(value, 2); OnPropertyChanged(); } get { return _RGLR.Tijdsconstante; } }
-        public string Type { set { _RGLR.Type = value; OnPropertyChanged(); } }
+        public string Type { set { _RGLR.Type = value; OnPropertyChanged(); } get { return _RGLR.Type; } }
 
 
         public double Kracht { set { _proces.Kracht = Math.Round(value, 2); OnPropertyChanged(); } get { return _proces.Kracht; } }
         public string DodeTijd { set { _proces.DodeTijd = value; OnPropertyChanged(); } get { return _proces.DodeTijd; } }
         public string Orde { set { _proces.Orde = value; OnPropertyChanged(); } get { return _proces.Orde; } }
-        public double SimulatieSnelheid { set { _simulatieSnelheid = Math.Round(value, 1); OnPropertyChanged(); } get { return _simulatieSnelheid; } }
+
+        public double ProcesWaarde {private set { _procesWaarde = value; OnPropertyChanged(); } get {return _procesWaarde * 3; } }
+       
+        public double SimulatieSnelheid { set { _simulatieSnelheid = Math.Round(value, 2); OnPropertyChanged(); } get { return _simulatieSnelheid; } }
 
         private void StartSimulation()
         {
-            _isRunning = true;
-            _timer.Interval = TimeSpan.FromMilliseconds(_simulatieSnelheid * 100);
-            _timer.Start();
-        }
-        private void StopSimuation()
-        {
-            _isRunning = false;
-            _timer.Stop();
+            if ((TijdsConstante > 0) && (Kracht > 0)  && !string.IsNullOrEmpty(DodeTijd) && !string.IsNullOrEmpty(Orde) && !string.IsNullOrEmpty(Type))
+            {
+                IsRunning = true;
+                _timer.Interval = TimeSpan.FromMilliseconds(_simulatieSnelheid * 20);
+                _timer.Start();
+            }
+            else
+            {
+                IsRunning = false;
+            }
         }
         private void PauseSimulation()
         {
-
+            IsRunning = false;
+            _timer.Stop();
         }
 
+        private void ResetSimulation()
+        {
+            IsRunning = false;
+            _timer.Stop();
+
+            var rglrWaardes = MyPlot.Series[0] as LineSeries;
+            var procesWaardes = MyPlot.Series[1] as LineSeries;
+            var wensWaardes = MyPlot.Series[2] as LineSeries;
+
+            rglrWaardes.Points.Clear();
+            procesWaardes.Points.Clear();
+            wensWaardes.Points.Clear();
+            _currentXaxis = 0;
+
+            MyPlot.InvalidatePlot(true);
+
+            for(int i  = 0; i < _proces.DodeTijdNumber; i++)
+            {
+                _rglrWaarde = _RGLR.Berekening();
+                ProcesWaarde = _proces.Proces(_rglrWaarde);
+                _RGLR.X = _procesWaarde;
+            }
+
+            VSFP = 0;
+            VSFI = 0;
+            VSFD = 0;
+            W = 0;
+            TijdsConstante = 0;
+            Type = string.Empty;
+
+            Kracht = 0;
+            DodeTijd = string.Empty;
+            Orde = string.Empty;
+
+            ProcesWaarde = 0;
+            SimulatieSnelheid = 0.5;
+        }
         private void Timer_Tick(object? sender, EventArgs e)
         {
             _rglrWaarde = _RGLR.Berekening();
-            _procesWaarde = _proces.Proces(_rglrWaarde);
+            ProcesWaarde = _proces.Proces(_rglrWaarde);
             _RGLR.X = _procesWaarde;
             GraphAdd();
         }
