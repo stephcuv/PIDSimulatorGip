@@ -11,7 +11,6 @@ namespace PIDSimulatorGip.model
         private double _kracht;
         private string? _orde;
         private bool _krachtBerState;
-        private double _w;
 
         private byte _dodeTijd; //dodentijd enkel voor simulator
         private double T = 0;
@@ -23,16 +22,7 @@ namespace PIDSimulatorGip.model
         private double[] _procesUitkomsten;
 
         #region variabelen
-        public double W
-        {
-            set
-            {
-                if ((value >= 0) && value <= 100)
-                {
-                    _w = value;
-                }
-            }
-        }
+
         public double Kracht
         {
              get

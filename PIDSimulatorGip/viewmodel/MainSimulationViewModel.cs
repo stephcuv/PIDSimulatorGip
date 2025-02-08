@@ -7,6 +7,9 @@ using System.Drawing;
 using System.Windows.Threading;
 using OxyPlot.Axes;
 using System.Windows.Media;
+using System.Windows;
+using OxyPlot.Legends;
+using System.Diagnostics;
 
 namespace PIDSimulatorGip.viewmodel
 {
@@ -27,6 +30,11 @@ namespace PIDSimulatorGip.viewmodel
 
 
         private bool _isRunning;
+        private bool _standardSim;
+        private bool _serialComActive;
+        private bool _stapsprong;
+
+
         private double _simulatieSnelheid;
 
         public MainSimulationViewModel()
@@ -49,6 +57,9 @@ namespace PIDSimulatorGip.viewmodel
         public RelayCommand ResetCommand => new RelayCommand(execute => { ResetSimulation(); }, canExecute => { return _isRunning; });
         public RelayCommand PauzeCommand => new RelayCommand(exectue => { PauseSimulation(); }, canExecute => { return _isRunning; });
 
+        public RelayCommand StapSprongCommand => new RelayCommand(execute => { StapsprongFunction(); }, canExecute => { return !_isRunning; });
+        public RelayCommand SerialCommCommand => new RelayCommand(execute => { SerialComm(); }, canExecute => { return !_isRunning; });
+
 
         public PlotModel MyPlot { get { return _myPlot; } set { _myPlot = value; OnPropertyChanged(); } }
         public bool IsRunning { get {return !_isRunning; } set { _isRunning = value; OnPropertyChanged(); } }
@@ -56,7 +67,7 @@ namespace PIDSimulatorGip.viewmodel
         public double VSFP { get { return _RGLR.VSFP; } set { _RGLR.VSFP = Math.Round(value, 3); OnPropertyChanged(); } }
         public double VSFI { get { return _RGLR.VSFI; } set { _RGLR.VSFI = Math.Round(value, 3); OnPropertyChanged(); } }
         public double VSFD { get { return _RGLR.VSFD; } set { _RGLR.VSFD = Math.Round(value, 3); OnPropertyChanged(); } }
-        public double W { get { return _RGLR.W; } set { _RGLR.W = Math.Round(value, 2); _proces.W = Math.Round(value, 2); OnPropertyChanged(); } }
+        public double W { get { return _RGLR.W; } set { _RGLR.W = Math.Round(value, 2); OnPropertyChanged(); } }
         public double TijdsConstante { set { _RGLR.Tijdsconstante = Math.Round(value, 2); _proces.Tijdsconstante = Math.Round(value, 2); OnPropertyChanged(); } get { return _RGLR.Tijdsconstante; } }
         public string Type { set { _RGLR.Type = value; OnPropertyChanged(); } get { return _RGLR.Type; } }
 
@@ -68,18 +79,25 @@ namespace PIDSimulatorGip.viewmodel
         public double ProcesWaarde {private set { _procesWaarde = value; OnPropertyChanged(); } get {return _procesWaarde * 3; } }
        
         public double SimulatieSnelheid { set { _simulatieSnelheid = Math.Round(value, 2); OnPropertyChanged(); } get { return _simulatieSnelheid; } }
+        public bool SerialComActive { set { _serialComActive = value; OnPropertyChanged(); } get { return _serialComActive; } }
+        public bool Stapsprong {set { _stapsprong = value; OnPropertyChanged(); } get { return _stapsprong; } }
 
         private void StartSimulation()
         {
-            if ((TijdsConstante > 0) && (Kracht > 0)  && !string.IsNullOrEmpty(DodeTijd) && !string.IsNullOrEmpty(Orde) && !string.IsNullOrEmpty(Type))
+            if (!_stapsprong && !_serialComActive)
             {
-                IsRunning = true;
-                _timer.Interval = TimeSpan.FromMilliseconds(_simulatieSnelheid * 20);
-                _timer.Start();
-            }
-            else
-            {
-                IsRunning = false;
+                if ((TijdsConstante > 0) && (Kracht > 0) && !string.IsNullOrEmpty(DodeTijd) && !string.IsNullOrEmpty(Orde) && !string.IsNullOrEmpty(Type))
+                {
+                    IsRunning = true;
+                    _standardSim = true;
+                    _timer.Interval = TimeSpan.FromMilliseconds(_simulatieSnelheid * 20);
+                    _timer.Start();
+                }
+                else
+                {
+                    IsRunning = false;
+                    _standardSim = false;
+                }
             }
         }
         private void PauseSimulation()
@@ -88,6 +106,15 @@ namespace PIDSimulatorGip.viewmodel
             _timer.Stop();
         }
 
+        private void StapsprongFunction()
+        {
+
+        }
+
+        private void SerialComm()
+        {
+
+        }
         private void ResetSimulation()
         {
             IsRunning = false;
@@ -125,6 +152,8 @@ namespace PIDSimulatorGip.viewmodel
             ProcesWaarde = 0;
             SimulatieSnelheid = 0.5;
         }
+
+
         private void Timer_Tick(object? sender, EventArgs e)
         {
             _rglrWaarde = _RGLR.Berekening();
@@ -137,25 +166,72 @@ namespace PIDSimulatorGip.viewmodel
         {
             if (MyPlot.Series.Count == 0)
             {
-                MyPlot.Series.Add(new LineSeries { Title = "Regelaar Waardes" });
-                MyPlot.Series.Add(new LineSeries { Title = "Proces Waardes" });
-                MyPlot.Series.Add(new LineSeries { Title = "Wenswaarde" });
+                var legend = new Legend
+                {
+                    LegendPosition = LegendPosition.TopCenter,
+                    LegendPlacement = LegendPlacement.Outside,
+                    LegendOrientation = LegendOrientation.Horizontal,
+                    LegendBorderThickness = 1
+                };
+                MyPlot.Legends.Add(legend);
+
+                if (_standardSim || _serialComActive)
+                {
+                    var sharedTrackerFormat = "tijdstip: {2:0} sec\n" + "Regelaar Waarde: {4:0.00}\n" + "Proces Waarde: {4:0.00}\n" + "Wenswaarde: {4:0.00}";
+
+                    MyPlot.Series.Add(new LineSeries { Title = "Regelaar Waarde", TrackerFormatString = sharedTrackerFormat});
+                    MyPlot.Series.Add(new LineSeries { Title = "Proces Waarde", TrackerFormatString = sharedTrackerFormat });
+                    MyPlot.Series.Add(new LineSeries { Title = "Wenswaarde", TrackerFormatString = sharedTrackerFormat });
+                }
+                else if(_stapsprong)
+                {
+                    var sharedTrackerFormat = "tijdstip: {2:0} sec\n" + "Proces Waarde: {4:0.00}\n" + "Wenswaarde: {4:0.00}";
+
+                    MyPlot.Series.Add(new LineSeries { Title = "Proces Waarde", TrackerFormatString = sharedTrackerFormat });
+                    MyPlot.Series.Add(new LineSeries { Title = "Wenswaarde", TrackerFormatString = sharedTrackerFormat });
+                }
+                else
+                {
+                    Debug.WriteLine("fout in maken van de lineseries");
+                }
             }
-            var rglrWaardes = MyPlot.Series[0] as LineSeries;
-            var procesWaardes = MyPlot.Series[1] as LineSeries;
-            var wensWaardes = MyPlot.Series[2] as LineSeries;
+            if (_standardSim || _serialComActive)
+            {
+                var rglrWaardes = MyPlot.Series[0] as LineSeries;
+                var procesWaardes = MyPlot.Series[1] as LineSeries;
+                var wensWaardes = MyPlot.Series[2] as LineSeries;
 
-            _currentXaxis += 5;
+                _currentXaxis += 5;
 
-            rglrWaardes.Points.Add(new DataPoint(_currentXaxis, _rglrWaarde));
-            procesWaardes.Points.Add(new DataPoint(_currentXaxis, _procesWaarde));
-            wensWaardes.Points.Add(new DataPoint(_currentXaxis, W));
+                rglrWaardes.Points.Add(new DataPoint(_currentXaxis, _rglrWaarde));
+                procesWaardes.Points.Add(new DataPoint(_currentXaxis, _procesWaarde));
+                wensWaardes.Points.Add(new DataPoint(_currentXaxis, W));
 
 
-            if (rglrWaardes.Points.Count > 100) rglrWaardes.Points.RemoveAt(0);
-            if (procesWaardes.Points.Count > 100) procesWaardes.Points.RemoveAt(0);
-            if (wensWaardes.Points.Count > 100) wensWaardes.Points.RemoveAt(0);
+                if (rglrWaardes.Points.Count > 100) rglrWaardes.Points.RemoveAt(0);
+                if (procesWaardes.Points.Count > 100) procesWaardes.Points.RemoveAt(0);
+                if (wensWaardes.Points.Count > 100) wensWaardes.Points.RemoveAt(0);
+            }
 
+            else if(_stapsprong)
+            {
+                var procesWaardes = MyPlot.Series[0] as LineSeries;
+                var wensWaardes = MyPlot.Series[1] as LineSeries;
+
+                _currentXaxis += 5;
+
+                procesWaardes.Points.Add(new DataPoint(_currentXaxis, _procesWaarde));
+                wensWaardes.Points.Add(new DataPoint(_currentXaxis, W));
+
+
+                if (procesWaardes.Points.Count > 100) procesWaardes.Points.RemoveAt(0);
+                if (wensWaardes.Points.Count > 100) wensWaardes.Points.RemoveAt(0);
+            }
+
+            else
+            {
+                Debug.WriteLine("error in tekeken van graph"); 
+            }
             var xAxis = MyPlot.Axes.FirstOrDefault(a => a.Position == AxisPosition.Bottom);
             if (xAxis != null)
             {
