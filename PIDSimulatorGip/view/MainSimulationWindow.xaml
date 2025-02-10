@@ -26,14 +26,14 @@
                 <RowDefinition/>
                 <RowDefinition/>
             </Grid.RowDefinitions>
-            <Button Margin="10" Height="20" Width="20" Background="RoyalBlue"/>
-            <Button Grid.Row="1"  Height="20" Width="20" Background="RosyBrown" Command="{Binding SerialCommCommand}"/>
+            <Button Margin="10" Height="20" Width="20" Background="RoyalBlue" Command="{Binding SerialCommCommand}"/>
+            <Button Grid.Row="1"  Height="20" Width="20" Background="RosyBrown" Command="{Binding StapSprongCommand}"/>
             <Button Grid.Row="2"  Height="20" Width="20" Background="DarkOliveGreen"/>
-            <Button Grid.Row="3"  Height="20" Width="20" Background="White"/>
+            <Button Grid.Row="3"  Height="20" Width="20" Background="Purple"/>
         </Grid>
         <!--#endregion-->
         <!--#region PIDControlGrid-->
-        <Grid Grid.Column="1" Name="PIDControlGrid" Margin="15" HorizontalAlignment="Left" Visibility="Visible">
+        <Grid Grid.Column="1" Name="PIDControlGrid" Margin="15" HorizontalAlignment="Left" Visibility="{Binding RegelaarVisibility, UpdateSourceTrigger=PropertyChanged}">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition/>
                 <ColumnDefinition/>
@@ -75,7 +75,7 @@
         </Grid>
         <!--#endregion-->
         <!--#region proces grid -->
-        <Grid x:Name="ProcesGrid" Grid.Row="1" Grid.Column="1" Margin="10" HorizontalAlignment="Left" Visibility="Visible">
+        <Grid x:Name="ProcesGrid" Grid.Row="1" Grid.Column="1" Margin="10" HorizontalAlignment="Left" Visibility="{Binding ProcesVisibility, UpdateSourceTrigger=PropertyChanged}">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition/>
                 <ColumnDefinition/>
@@ -125,8 +125,20 @@
             <Button Name="PauseBtn" Grid.Row="5" Grid.Column="1" Content="Pauze" Height="20" Width="50" HorizontalAlignment="Center" Command="{Binding PauzeCommand}"/>
         </Grid>
         <!--#endregion-->
+        <!--#stapsprong grid -->
+        <Grid Name="StapSprongGrid" Grid.Column="1" HorizontalAlignment="Center" Margin="10" VerticalAlignment="Center" Visibility="{Binding StapsprongVisibility, UpdateSourceTrigger=PropertyChanged}">
+            <StackPanel>
+                <WrapPanel Margin="10">
+                    <TextBlock HorizontalAlignment="Center" Text="stapsprong      " FontSize="15" Foreground="White"/>
+                    <Slider Minimum="0" Maximum="100" Width="200" Value="{Binding StapsprongWaarde, UpdateSourceTrigger=PropertyChanged}"/>
+                    <TextBlock FontSize="15" Foreground="White" Text="{Binding StapsprongWaarde}"/>
+                </WrapPanel>
+            </StackPanel>
+        </Grid>
+        <!--#endregion-->
+        
         <!--#region serial connection grid -->
-        <StackPanel Name="SerialStackPanel" Grid.Row="1" Grid.Column="1" HorizontalAlignment="Center" Visibility="Hidden">
+        <StackPanel Name="SerialStackPanel" Grid.Row="1" Grid.Column="1" HorizontalAlignment="Center" Visibility="{Binding SerialVisibility}">
             <TextBlock Text="SerialComunication" FontSize="15" Foreground="White" Margin="0,0,0,20" HorizontalAlignment="Center"/>
             <WrapPanel HorizontalAlignment="Center">
                 <TextBlock Text="auto connect" FontSize="15" Foreground="White"/>
