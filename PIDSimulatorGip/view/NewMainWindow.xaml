@@ -1,0 +1,205 @@
+﻿<Window x:Class="PIDSimulatorGip.view.NewMainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:PIDSimulatorGip.view" xmlns:oxy="http://oxyplot.org/wpf"
+        mc:Ignorable="d"
+        Title="NewMainWindow" Height="450" Width="800">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="auto"/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="auto"/>
+        </Grid.RowDefinitions>
+        <!--#region simulation Controlgrid & regelaar/stapsprong grid-->
+        <Grid Grid.ColumnSpan="2" HorizontalAlignment="Center">
+            <WrapPanel>
+                <!--#region regelaar grid-->
+                <Grid Grid.ColumnSpan="2" HorizontalAlignment="Center" VerticalAlignment="Center" Visibility="Visible" Margin="10">
+                    <Border BorderBrush="Black" BorderThickness="2">
+                        <StackPanel>
+                            <TextBlock FontSize="18" Foreground="Black" HorizontalAlignment="Center" Text="regelaar"/>
+                            <WrapPanel HorizontalAlignment="Center">
+                                <TextBlock FontSize="15" Foreground="Black" Text="P - actie waarde"/>
+                                <TextBlock FontSize="15" Foreground="Black" Text="binding"/>
+                            </WrapPanel>
+                            <WrapPanel HorizontalAlignment="Center">
+                                <Slider Minimum="0" Maximum="5" Width="150"/>
+                                <TextBlock FontSize="15" Foreground="Black" Text="binging"/>
+                            </WrapPanel>
+                            <WrapPanel HorizontalAlignment="Center">
+                                <TextBlock FontSize="15" Foreground="Black" Text="I - actie waarde "/>
+                                <TextBlock FontSize="15" Foreground="Black" Text="binding"/>
+                            </WrapPanel>
+                            <WrapPanel HorizontalAlignment="Center">
+                                <Slider Minimum="0" Maximum="5" Width="150"/>
+                                <TextBlock FontSize="15" Foreground="Black" Text="binging"/>
+                            </WrapPanel>
+                            <WrapPanel HorizontalAlignment="Center">
+                                <TextBlock FontSize="15" Foreground="Black" Text="D - actie waarde "/>
+                                <TextBlock FontSize="15" Foreground="Black" Text="binding"/>
+                            </WrapPanel>
+                            <WrapPanel HorizontalAlignment="Center">
+                                <Slider Minimum="0" Maximum="5" Width="150"/>
+                                <TextBlock FontSize="15" Foreground="Black" Text="binging"/>
+                            </WrapPanel>
+                        </StackPanel>
+                    </Border>
+                </Grid>
+                <!--#endregion-->
+                <!--#region stapsprong grid-->
+                <Grid Grid.ColumnSpan="2" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="10" Visibility="Visible">
+                    <Border HorizontalAlignment="Center" VerticalAlignment="Center"  BorderBrush="Red" BorderThickness="2">
+                        <StackPanel>
+                            <TextBlock HorizontalAlignment="Center" FontSize="18" Foreground="Red" Text="stapsprong" Margin="5"/>
+                            <WrapPanel HorizontalAlignment="Center">
+                                <TextBlock HorizontalAlignment="Center" FontSize="15" Foreground="Red" Text="StartWaarde "/>
+                                <TextBlock FontSize="15" Foreground="Red" Text="binding"/>
+                            </WrapPanel>
+                            <Slider Minimum="0" Maximum="100" />
+                            <WrapPanel HorizontalAlignment="Center">
+                                <TextBlock FontSize="15" Foreground="Red" Text="spong waarde "/>
+                                <TextBlock FontSize="15" Foreground="Red" Text="binding"/>
+                            </WrapPanel>
+                            <Slider Minimum="0" Maximum="100" Margin="5"/>
+                            <Button Content="start" FontSize="15" Foreground="Red" Background="White" BorderThickness="1" BorderBrush="Red" Margin="2"/>
+                        </StackPanel>
+                    </Border>
+                </Grid>
+                <!--#endregion-->
+                <!--#region simulationcontrol grid-->
+                <Grid>
+                    <Border BorderBrush="RoyalBlue" BorderThickness="2" Margin="10" >
+                        <Grid HorizontalAlignment="Center">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="auto"/>
+                                <ColumnDefinition Width="auto"/>
+                                <ColumnDefinition Width="auto"/>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition/>
+                                <RowDefinition/>
+                                <RowDefinition Height="auto"/>
+                            </Grid.RowDefinitions>
+                            <TextBlock Text="simulatiecontrols" FontSize="18" Foreground="RoyalBlue" VerticalAlignment="Top" HorizontalAlignment="Center" Grid.ColumnSpan="3"/>
+                            <TextBlock Text="simulatiesnelheid" FontSize="15" Foreground="RoyalBlue" Grid.ColumnSpan="3" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="2"/>
+                            <Slider Grid.Row="1" Grid.ColumnSpan="2" Minimum="5" Maximum="0.5" Width="200"/>
+                            <TextBlock Text="binding" FontSize="15" Foreground="RoyalBlue" Grid.Row="1" Grid.Column="2" HorizontalAlignment="Center"/>
+
+                            <Button Margin="15" Height="20" Width="50" Background="White" BorderBrush="RoyalBlue" Grid.Row="2" Content="start"/>
+                            <Button Margin="15" Height="20" Width="50" Background="White" BorderBrush="RoyalBlue" Grid.Row="2" Grid.Column="1" Content="pauze"/>
+                            <Button Margin="15" Height="20" Width="50" Background="White" BorderBrush="RoyalBlue" Grid.Row="2" Grid.Column="2" Content="reset"/>
+
+                        </Grid>
+                    </Border>
+                </Grid>
+                <!--#endregion-->
+            </WrapPanel>
+        </Grid>
+        <!--#endregion-->
+
+        <!--#region proces/graph grid-->
+        <Grid Grid.Row="1">
+            <Border BorderBrush="Green" BorderThickness="2" Margin="2">
+                <Grid HorizontalAlignment="Stretch">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <StackPanel HorizontalAlignment="Stretch">
+                        <WrapPanel>
+                            <TextBox Text="proceskracht" FontSize="15" Foreground="Green" Margin="2,0,2,0"/>
+                            <Slider Minimum="0" Maximum="5" Width="150"/>
+                            <TextBox Text="binding" FontSize="15" Foreground="Green" Margin="2,0,2,0"/>
+
+                            <TextBox Text="tijdsconstante" FontSize="15" Foreground="Green"/>
+                            <Slider Minimum="0" Maximum="5" Width="150" IsEnabled="{Binding IsRunning}"/>
+                            <TextBox Text="binding" FontSize="15" Foreground="Green" Margin="2,0,2,0"/>
+                        </WrapPanel>
+                        <WrapPanel>
+                            <TextBlock Grid.Row="1" Text="proces orde" FontSize="15" Foreground="Green" Margin="2"/>
+                            <ComboBox Name="ProcesOrdeCMB" Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" Height="20" Width="100" HorizontalAlignment="Left" VerticalAlignment="Top" IsEnabled="{Binding IsRunning}" SelectedValue="{Binding Orde, Mode=TwoWay}">
+                                <ComboBoxItem Content="0orde"/>
+                                <ComboBoxItem Content="1orde"/>
+                                <ComboBoxItem Content="2orde"/>
+                            </ComboBox>
+                            <TextBox Text="dodetijd" FontSize="15" Foreground="Green" Margin="2"/>
+                            <ComboBox Name="DodetijdCMB" Height="20" Width="150" Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="2" HorizontalAlignment="Left" VerticalAlignment="Top" IsEnabled="{Binding IsRunning}" SelectedValue="{Binding DodeTijd, Mode=TwoWay}">
+                                <ComboBoxItem Content="geen dodetijd"/>
+                                <ComboBoxItem Content="klein beetje dodetijd"/>
+                                <ComboBoxItem Content="wat dodetijd"/>
+                                <ComboBoxItem Content="gemiddeld dodetijd"/>
+                                <ComboBoxItem Content="meer dan gemiddeld dodetijd"/>
+                                <ComboBoxItem Content="veel dodetijd"/>
+                            </ComboBox>
+                        </WrapPanel>
+                    </StackPanel>
+                    <!--#region graph grid-->
+                    <Grid Grid.Row="1" Margin="5" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                        <Border BorderBrush="RoyalBlue" BorderThickness="2" Margin="2">
+                            <oxy:PlotView Model="{Binding MyPlot}"/>
+                        </Border>
+                    </Grid>
+                </Grid>
+                <!--#endregion-->
+            </Border>
+
+        </Grid>
+        <!--#endregion-->
+        <!--#region animationgrid-->
+        <Grid Grid.Row="1" Grid.Column="1" HorizontalAlignment="Center" Margin="2">
+            <Border BorderBrush="Green" BorderThickness="2" Margin="2">
+                <Grid Name="AnimationGrid" Grid.Column="2" Margin="10" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
+
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+
+                    <!-- Centered WaterTankAnimation -->
+                    <Grid Name="WaterTankAnimation" Grid.Row="1" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Center" Visibility="Visible">
+
+                        <!-- Water Tank Container -->
+                        <Border BorderBrush="Black" BorderThickness="2" CornerRadius="5" Width="150" Height="200" Background="LightGray" VerticalAlignment="Center" HorizontalAlignment="Center">
+
+                            <!-- Water Level -->
+                            <Grid VerticalAlignment="Bottom" HorizontalAlignment="Stretch" Margin="5">
+                                <Rectangle Name="WaterRectangle" Fill="LightBlue" VerticalAlignment="Bottom" HorizontalAlignment="Stretch" Height="{Binding ProcesWaarde}"/>
+                            </Grid>
+                        </Border>
+                    </Grid>
+                </Grid>
+
+            </Border>
+        </Grid>
+        <!--#endregion-->
+
+        <!--#region underbar-->
+        <Grid Grid.Row="2" Grid.ColumnSpan="2">
+            <Border Margin="2" BorderBrush="RoyalBlue" BorderThickness="2">
+                <WrapPanel HorizontalAlignment="Center">
+                    <TextBlock Text="stapsprong" FontSize="15" Foreground="Red" Margin="2,0,2,0"/>
+                    <Button Background="Red" Width="20" Height="20" Margin="2,2,2,2" IsEnabled="{Binding IsRunning}"/>
+                    <TextBlock Text="regelaar" FontSize="15" Foreground="Black" Margin="2,0,2,0"/>
+                    <Button Background="Black" Width="20" Height="20" Margin="2,2,2,2" IsEnabled="{Binding IsRunning}"/>
+                    <TextBlock Text="Seriële communicatie" FontSize="15" Foreground="Orange" Margin="2,0,2,0"/>
+                    <Button Background="Orange" Width="20" Height="20" Margin="2,2,2,2" IsEnabled="{Binding IsRunning}"/>
+                </WrapPanel>
+            </Border>
+        </Grid>
+        <!--#endregion-->
+    </Grid>
+</Window>
+
