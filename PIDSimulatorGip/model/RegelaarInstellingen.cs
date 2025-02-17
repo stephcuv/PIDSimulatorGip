@@ -8,23 +8,32 @@ namespace PIDSimulatorGip.model
 {
     class RegelaarInstellingen
     {
-        private PIDBerekeningen PIDBerekeningen = new PIDBerekeningen();
-
-        private string? _regelaar;
-        private string _geschakeld = "Parallel";
+        #region variabelen
+        private string _type;
 
         private double _y;
-        private double _prevY;
+        private double _w;
 
-        private double _dFilter;
+        private double _vsfP;
+
+        private double _vsfI;
+
+        private double _vsfD;
+
         private double _tijdsconstante;
 
+        private double[] _foutWaardes = new double[3];
+        private double[] _meetWaardes = new double[3];
+
+        //variabelen voor het afprinten in exel van de uitkomst  appart
         private double _pWaarde;
         private double _iWaarde;
         private double _dWaarde;
 
-        #region public variabelen
+        private double _prevStuurWaarde;
 
+
+        #region instantievariabelen
         public double PWaarde
         {
             get { return _pWaarde; }
@@ -39,46 +48,22 @@ namespace PIDSimulatorGip.model
         }
         public double Tijdsconstante
         {
-            get
-            {
-                return _tijdsconstante;
-            }
-            set
-            {
-                if (value > 0)
-                {
-                    _tijdsconstante = value;
-                }
-            }
+            get {return _tijdsconstante;}
+            set { if (value >= 0) { _tijdsconstante = value; } }
         }
 
-        public string Regelaar
+        public string Type
         {
             get
             {
-                return _regelaar;
+                return _type;
             }
             set
             {
                 if (!string.IsNullOrEmpty(value))
                 {
-                    _regelaar = value;
-                }
-            }
-        }
-        //public variabele om de instantievariabele te kunnen aanpassen.
-        //kan serieel of parallel zijn. 
-        public string Geschakeld
-        {
-            get
-            {
-                return _geschakeld;
-            }
-            set
-            {
-                if (!string.IsNullOrEmpty(value))
-                {
-                    _geschakeld = value;
+                    string result = value.Substring(value.IndexOf(":") + 2);
+                    _type = result;
                 }
             }
         }
@@ -98,45 +83,39 @@ namespace PIDSimulatorGip.model
         {
             get
             {
-                return PIDBerekeningen.X;
+                return _meetWaardes[0];
             }
             set
             {
-                PIDBerekeningen.X = value;
+                ArrayAdd(_meetWaardes, value);
             }
         }
         public double W
         {
             get
             {
-                return PIDBerekeningen.W;
+                return _w;
             }
             set
             {
-                if ((value > 0) && value <= 100)
+                if ((value >= 0) && value <= 100)
                 {
-                    PIDBerekeningen.W = value;
+                    _w = value;
                 }
             }
-        }
-
-        public double Dfilter
-        {
-            get { return _dFilter; }
-            set { if (value >= 0 && value < 1) { _dFilter = value; } }
         }
 
         public double VSFP
         {
             get
             {
-                return PIDBerekeningen.VSFP;
+                return _vsfP;
             }
             set
             {
-                if (value > 0)
+                if (value >= 0)
                 {
-                    PIDBerekeningen.VSFP = value;
+                    _vsfP = value;
                 }
             }
         }
@@ -144,13 +123,13 @@ namespace PIDSimulatorGip.model
         {
             get
             {
-                return PIDBerekeningen.VSFI;
+                return _vsfI;
             }
             set
             {
-                if (value > 0)
+                if (value >= 0)
                 {
-                    PIDBerekeningen.VSFI = value;
+                    _vsfI = value;
                 }
             }
         }
@@ -158,110 +137,35 @@ namespace PIDSimulatorGip.model
         {
             get
             {
-                return PIDBerekeningen.VSFD;
+                return _vsfD;
             }
             set
             {
-                if (value > 0)
+                if (value >= 0)
                 {
-                    PIDBerekeningen.VSFD = value;
+                    _vsfD = value;
                 }
             }
         }
         #endregion
-        private double Parallel()
-        {
-            double outcome = 0;
-            switch (_regelaar)
-            {
-                case "P":
-                    outcome = PIDBerekeningen.PRegelaar(false, false, 0);
-                    break;
-                case "I":
-                    PIDBerekeningen.Tijdsconstante = Tijdsconstante;
-                    outcome = PIDBerekeningen.IRegelaar(false, false, 0);
-                    PIDBerekeningen.EllapsedTime();
-                    break;
-
-                case "PI":
-                    PIDBerekeningen.Tijdsconstante = Tijdsconstante;
-                    _pWaarde = PIDBerekeningen.PRegelaar(false, false, 0);
-                    _iWaarde = PIDBerekeningen.IRegelaar(false, false, 0);
-                    outcome = _pWaarde + _iWaarde;
-                    PIDBerekeningen.EllapsedTime();
-                    break;
-                case "PD":
-                    PIDBerekeningen.Tijdsconstante = Tijdsconstante;
-                    PIDBerekeningen.DFilter = Dfilter;
-                    _pWaarde = PIDBerekeningen.PRegelaar(false, false, 0);
-                    _iWaarde = PIDBerekeningen.DRegelaar(false, false, 0);
-                    outcome = _pWaarde + _iWaarde;
-                    PIDBerekeningen.EllapsedTime();
-                    break;
-                case "PID":
-                    PIDBerekeningen.Tijdsconstante = Tijdsconstante;
-                    PIDBerekeningen.DFilter = Dfilter;
-
-                    _pWaarde = PIDBerekeningen.PRegelaar(false, false, 0);
-                    _iWaarde = PIDBerekeningen.IRegelaar(false, false, 0);
-                    _dWaarde = PIDBerekeningen.DRegelaar(false, false, 0);
-                    outcome = _pWaarde + _iWaarde + _dWaarde;
-                    PIDBerekeningen.EllapsedTime();
-                    break;
-            }
-            return outcome;
-        }
-
-        private double Serial()
-        {
-            double outcome = 0;
-            switch (_regelaar)
-            {
-                case "PI":
-                    PIDBerekeningen.Tijdsconstante = Tijdsconstante;
-                    _pWaarde = PIDBerekeningen.PRegelaar(true, true, 0);
-                    _iWaarde = PIDBerekeningen.IRegelaar(true, false, _pWaarde);
-                    PIDBerekeningen.EllapsedTime();
-                    outcome = _pWaarde + _iWaarde;
-                    break;
-                case "PD":
-                    PIDBerekeningen.Tijdsconstante = Tijdsconstante;
-                    PIDBerekeningen.DFilter = Dfilter;
-                    _pWaarde = PIDBerekeningen.PRegelaar(true, true, 0);
-                    _dWaarde = PIDBerekeningen.DRegelaar(true, false, _pWaarde);
-                    outcome = _pWaarde + _dWaarde;
-                    PIDBerekeningen.EllapsedTime();
-                    break;
-                case "PID":
-                    PIDBerekeningen.Tijdsconstante = Tijdsconstante;
-                    PIDBerekeningen.DFilter = Dfilter;
-
-                    _pWaarde = PIDBerekeningen.PRegelaar(true, true, 0);
-                    _iWaarde = PIDBerekeningen.IRegelaar(true, false, _pWaarde);
-                    _dWaarde = PIDBerekeningen.DRegelaar(true, false, _pWaarde);
-                    outcome = _pWaarde + _iWaarde + _dWaarde;
-                    PIDBerekeningen.EllapsedTime();
-                    break;
-            }
-            return outcome;
-        }
+        #endregion
 
         private void RegelaarBerekening()
         {
-            double _endOutcome = 0;
-            switch (_geschakeld)
+            switch (_type)
             {
-                case "Parallel":
-
-                    _endOutcome = Parallel();
+                case "Type A":
+                    ArrayAdd(_foutWaardes, Fout()); 
+                    TypeA();
                     break;
-                case "Serieel":
-
-                    _endOutcome = Serial();
-
+                case "Type B":
+                    ArrayAdd(_foutWaardes, Fout());
+                    TypeB();
+                    break;
+                case "Type C":
+                    TypeC();
                     break;
             }
-            Y = _endOutcome;
         }
 
         public double Berekening()
@@ -269,14 +173,91 @@ namespace PIDSimulatorGip.model
             RegelaarBerekening();
             if (Y == 0)
             {
-                return _prevY;
+                return _prevStuurWaarde;
             }
             else
             {
-                _prevY = Y;
+                _prevStuurWaarde = Y;
                 return Y;
             }
 
         }
+
+        #region types
+        private void TypeA()
+        {
+
+            _pWaarde = _vsfP * (_foutWaardes[0] - _foutWaardes[1]);
+            _iWaarde = _vsfI * _foutWaardes[0] * _tijdsconstante;
+            _dWaarde = (_vsfD / _tijdsconstante) * (_foutWaardes[0] - (2 * _foutWaardes[1]) + _foutWaardes[2]);
+
+                double temp = _prevStuurWaarde + _pWaarde + _iWaarde + _dWaarde;
+            if(temp < 0)
+            {
+                temp = 0;
+            }
+            else if(temp > 100)
+            {
+                temp = 100;
+            }
+            Y = temp;
+        }
+
+        private void TypeB()
+        {
+            _pWaarde = _vsfP * (_foutWaardes[0] - _foutWaardes[1]);
+            _iWaarde = _vsfI * _foutWaardes[0] * _tijdsconstante;
+            _dWaarde = (_vsfD / _tijdsconstante) * (_meetWaardes[0] - (2 * _meetWaardes[1]) + _meetWaardes[2]);
+
+
+            double temp = _prevStuurWaarde + _pWaarde + _iWaarde - _dWaarde;
+            if (temp < 0)
+            {
+                temp = 0;
+            }
+            else if (temp > 100)
+            {
+                temp = 100;
+            }
+            Y = temp;
+        }
+
+        private void TypeC()
+        {
+            _pWaarde = _vsfP * (_meetWaardes[0] - _meetWaardes[1]);
+            _iWaarde = _vsfI * Fout() * _tijdsconstante;
+            _dWaarde = (_vsfD / _tijdsconstante) * (_meetWaardes[0] - (2 * _meetWaardes[1]) + _meetWaardes[2]);
+
+
+            double temp = _prevStuurWaarde + _pWaarde + _iWaarde - _dWaarde;
+            if (temp < 0)
+            {
+                temp = 0;
+            }
+            else if (temp > 100)
+            {
+                temp = 100;
+            }
+            Y = temp;
+        }
+
+        private double Fout()
+        {
+            return _w - _meetWaardes[0];
+        }
+        #endregion
+
+        #region arrayAddFunctions
+
+        private void ArrayAdd(double[] array, double value)
+        {
+            for (int i = array.Length - 1; i > 0; i--)
+            {
+                array[i] = array[i - 1];
+            }
+            array[0] = value;
+        }
+        #endregion
+
     }
 }
