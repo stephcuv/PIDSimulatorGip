@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:PIDSimulatorGip.view" xmlns:oxy="http://oxyplot.org/wpf"
         mc:Ignorable="d"
-        Title="NewMainWindow" Height="450" Width="800">
+        Title="NewMainWindow" MinHeight="480" MinWidth="800">
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"/>
@@ -20,40 +20,50 @@
         <Grid Grid.ColumnSpan="2" HorizontalAlignment="Center">
             <WrapPanel>
                 <!--#region regelaar grid-->
-                <Grid Grid.ColumnSpan="2" HorizontalAlignment="Center" VerticalAlignment="Center" Visibility="Visible" Margin="10">
+                <Grid Grid.ColumnSpan="2" HorizontalAlignment="Center" VerticalAlignment="Center" Visibility="{Binding RegelaarVisibility}" Margin="10">
+                    
                     <Border BorderBrush="Black" BorderThickness="2">
                         <StackPanel>
                             <TextBlock FontSize="18" Foreground="Black" HorizontalAlignment="Center" Text="regelaar"/>
+                            <WrapPanel>
+                                <TextBlock Text="type" FontSize="15" Foreground="Black" Margin="0,0,5,0"/>
+                                <ComboBox IsEnabled="{Binding IsRunning}" Height="20" Width="150" SelectedValue="{Binding Type}">
+                                    <ComboBoxItem Content="Type A"/>
+                                    <ComboBoxItem Content="Type B"/>
+                                    <ComboBoxItem Content="Type C"/>
+                                </ComboBox>
+                            </WrapPanel>
                             <WrapPanel HorizontalAlignment="Center">
                                 <TextBlock FontSize="15" Foreground="Black" Text="P - actie waarde"/>
                                 <TextBlock FontSize="15" Foreground="Black" Text="binding"/>
                             </WrapPanel>
                             <WrapPanel HorizontalAlignment="Center">
-                                <Slider Minimum="0" Maximum="5" Width="150"/>
-                                <TextBlock FontSize="15" Foreground="Black" Text="binging"/>
+                                <Slider Minimum="0" Maximum="5" Width="150" Value="{Binding VSFP, UpdateSourceTrigger=PropertyChanged}"/>
+                                <TextBlock FontSize="15" Foreground="Black" Text="{Binding VSFP}"/>
                             </WrapPanel>
                             <WrapPanel HorizontalAlignment="Center">
                                 <TextBlock FontSize="15" Foreground="Black" Text="I - actie waarde "/>
                                 <TextBlock FontSize="15" Foreground="Black" Text="binding"/>
                             </WrapPanel>
                             <WrapPanel HorizontalAlignment="Center">
-                                <Slider Minimum="0" Maximum="5" Width="150"/>
-                                <TextBlock FontSize="15" Foreground="Black" Text="binging"/>
+                                <Slider Minimum="0" Maximum="5" Width="150" Value="{Binding VSFI}"/>
+                                <TextBlock FontSize="15" Foreground="Black" Text="{Binding VSFI}"/>
                             </WrapPanel>
                             <WrapPanel HorizontalAlignment="Center">
                                 <TextBlock FontSize="15" Foreground="Black" Text="D - actie waarde "/>
                                 <TextBlock FontSize="15" Foreground="Black" Text="binding"/>
                             </WrapPanel>
                             <WrapPanel HorizontalAlignment="Center">
-                                <Slider Minimum="0" Maximum="5" Width="150"/>
-                                <TextBlock FontSize="15" Foreground="Black" Text="binging"/>
+                                <Slider Minimum="0" Maximum="5" Width="150" Value="{Binding VSFD}"/>
+                                <TextBlock FontSize="15" Foreground="Black" Text="{Binding VSFD}"/>
                             </WrapPanel>
                         </StackPanel>
                     </Border>
                 </Grid>
                 <!--#endregion-->
                 <!--#region stapsprong grid-->
-                <Grid Grid.ColumnSpan="2" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="10" Visibility="Visible">
+                <Grid Grid.ColumnSpan="2" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="10" Visibility="{Binding StapsprongVisibility}">
+                    
                     <Border HorizontalAlignment="Center" VerticalAlignment="Center"  BorderBrush="Red" BorderThickness="2">
                         <StackPanel>
                             <TextBlock HorizontalAlignment="Center" FontSize="18" Foreground="Red" Text="stapsprong" Margin="5"/>
@@ -66,7 +76,7 @@
                                 <TextBlock FontSize="15" Foreground="Red" Text="spong waarde "/>
                                 <TextBlock FontSize="15" Foreground="Red" Text="binding"/>
                             </WrapPanel>
-                            <Slider Minimum="0" Maximum="100" Margin="5"/>
+                            <Slider Minimum="0" Maximum="100" />
                             <Button Content="start" FontSize="15" Foreground="Red" Background="White" BorderThickness="1" BorderBrush="Red" Margin="2"/>
                         </StackPanel>
                     </Border>
@@ -77,24 +87,32 @@
                     <Border BorderBrush="RoyalBlue" BorderThickness="2" Margin="10" >
                         <Grid HorizontalAlignment="Center">
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="auto"/>
-                                <ColumnDefinition Width="auto"/>
-                                <ColumnDefinition Width="auto"/>
+                                <ColumnDefinition/>
+                                <ColumnDefinition/>
+                                <ColumnDefinition/>
                             </Grid.ColumnDefinitions>
                             <Grid.RowDefinitions>
                                 <RowDefinition/>
                                 <RowDefinition/>
+                                <RowDefinition/>
+                                <RowDefinition/>
+                                <RowDefinition/>
                                 <RowDefinition Height="auto"/>
                             </Grid.RowDefinitions>
-                            <TextBlock Text="simulatiecontrols" FontSize="18" Foreground="RoyalBlue" VerticalAlignment="Top" HorizontalAlignment="Center" Grid.ColumnSpan="3"/>
-                            <TextBlock Text="simulatiesnelheid" FontSize="15" Foreground="RoyalBlue" Grid.ColumnSpan="3" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="2"/>
-                            <Slider Grid.Row="1" Grid.ColumnSpan="2" Minimum="5" Maximum="0.5" Width="200"/>
-                            <TextBlock Text="binding" FontSize="15" Foreground="RoyalBlue" Grid.Row="1" Grid.Column="2" HorizontalAlignment="Center"/>
+                            <TextBlock Text="Simulatiecontrols" FontSize="18" Foreground="RoyalBlue" Grid.ColumnSpan="3" HorizontalAlignment="Center"/>
 
-                            <Button Margin="15" Height="20" Width="50" Background="White" BorderBrush="RoyalBlue" Grid.Row="2" Content="start"/>
-                            <Button Margin="15" Height="20" Width="50" Background="White" BorderBrush="RoyalBlue" Grid.Row="2" Grid.Column="1" Content="pauze"/>
-                            <Button Margin="15" Height="20" Width="50" Background="White" BorderBrush="RoyalBlue" Grid.Row="2" Grid.Column="2" Content="reset"/>
+                            <TextBlock Text="wenswaarde" Grid.Row="1"  FontSize="15" Foreground="RoyalBlue" Grid.ColumnSpan="3" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="2" Visibility="{Binding RegelaarVisibility}"/>
+                            <Slider Grid.Row="2" Grid.ColumnSpan="2" Minimum="0" Maximum="100" Width="200" Value="{Binding W}" Visibility="{Binding RegelaarVisibility}"/>
+                            <TextBlock Text="{Binding W}" FontSize="15" Foreground="RoyalBlue" Grid.Row="2" Grid.Column="2" HorizontalAlignment="Center" Visibility="{Binding RegelaarVisibility}"/>
 
+
+                            <TextBlock Text="simulatiesnelheid" Grid.Row="3" FontSize="15" Foreground="RoyalBlue" Grid.ColumnSpan="3" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="2" Visibility="{Binding SimulatieSnelheidVisibility}"/>
+                            <Slider Grid.Row="4" Grid.ColumnSpan="2" Minimum="0.5" Maximum="5" Width="200" IsEnabled="{Binding IsRunning}" Value="{Binding SimulatieSnelheid}" Visibility="{Binding SimulatieSnelheidVisibility}"/>
+                            <TextBlock Text="{Binding SimulatieSnelheid}" FontSize="15" Foreground="RoyalBlue" Grid.Row="4" Grid.Column="2" HorizontalAlignment="Center" Visibility="{Binding SimulatieSnelheidVisibility}"/>
+
+                            <Button Command="{Binding StartCommand}" Foreground="RoyalBlue" Margin="15,5,15,5" Height="20" Width="50" Background="White" BorderBrush="RoyalBlue" Grid.Row="5" Content="start"/>
+                            <Button Command="{Binding PauzeCommand}" Foreground="RoyalBlue" Margin="15,5,15,5" Height="20" Width="50" Background="White" BorderBrush="RoyalBlue" Grid.Row="5" Grid.Column="1" Content="pauze"/>
+                            <Button Command="{Binding ResetCommand}" Foreground="RoyalBlue" Margin="15,5,15,5" Height="20" Width="50" Background="White" BorderBrush="RoyalBlue" Grid.Row="5" Grid.Column="2" Content="reset"/>
                         </Grid>
                     </Border>
                 </Grid>
@@ -111,15 +129,15 @@
                         <RowDefinition Height="auto"/>
                         <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
-                    <StackPanel HorizontalAlignment="Stretch">
+                    <StackPanel HorizontalAlignment="Center">
                         <WrapPanel>
-                            <TextBox Text="proceskracht" FontSize="15" Foreground="Green" Margin="2,0,2,0"/>
-                            <Slider Minimum="0" Maximum="5" Width="150"/>
-                            <TextBox Text="binding" FontSize="15" Foreground="Green" Margin="2,0,2,0"/>
+                            <TextBlock Text="proceskracht" FontSize="15" Foreground="Green" Margin="2,0,10,0"/>
+                            <Slider Minimum="0" Maximum="5" Width="150" IsEnabled="{Binding IsRunning}" Value="{Binding TijdsConstante}"/>
+                            <TextBlock Text="{Binding TijdsConstante}" FontSize="15" Foreground="Green" Margin="2,0,2,0"/>
 
-                            <TextBox Text="tijdsconstante" FontSize="15" Foreground="Green"/>
-                            <Slider Minimum="0" Maximum="5" Width="150" IsEnabled="{Binding IsRunning}"/>
-                            <TextBox Text="binding" FontSize="15" Foreground="Green" Margin="2,0,2,0"/>
+                            <TextBlock Text="            tijdsconstante" FontSize="15" Foreground="Green" Margin="2,0,10,0"/>
+                            <Slider Minimum="0" Maximum="5" Width="150" IsEnabled="{Binding IsRunning}" Value="{Binding Kracht}"/>
+                            <TextBlock Text="{Binding Kracht}" FontSize="15" Foreground="Green" Margin="2,0,2,0"/>
                         </WrapPanel>
                         <WrapPanel>
                             <TextBlock Grid.Row="1" Text="proces orde" FontSize="15" Foreground="Green" Margin="2"/>
@@ -128,7 +146,7 @@
                                 <ComboBoxItem Content="1orde"/>
                                 <ComboBoxItem Content="2orde"/>
                             </ComboBox>
-                            <TextBox Text="dodetijd" FontSize="15" Foreground="Green" Margin="2"/>
+                            <TextBlock Text="             dodetijd" FontSize="15" Foreground="Green" Margin="2"/>
                             <ComboBox Name="DodetijdCMB" Height="20" Width="150" Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="2" HorizontalAlignment="Left" VerticalAlignment="Top" IsEnabled="{Binding IsRunning}" SelectedValue="{Binding DodeTijd, Mode=TwoWay}">
                                 <ComboBoxItem Content="geen dodetijd"/>
                                 <ComboBoxItem Content="klein beetje dodetijd"/>
@@ -153,7 +171,7 @@
         <!--#endregion-->
         <!--#region animationgrid-->
         <Grid Grid.Row="1" Grid.Column="1" HorizontalAlignment="Center" Margin="2">
-            <Border BorderBrush="Green" BorderThickness="2" Margin="2">
+            <Border BorderBrush="Green" BorderThickness="2" >
                 <Grid Name="AnimationGrid" Grid.Column="2" Margin="10" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
 
                     <Grid.RowDefinitions>
@@ -191,11 +209,10 @@
             <Border Margin="2" BorderBrush="RoyalBlue" BorderThickness="2">
                 <WrapPanel HorizontalAlignment="Center">
                     <TextBlock Text="stapsprong" FontSize="15" Foreground="Red" Margin="2,0,2,0"/>
-                    <Button Background="Red" Width="20" Height="20" Margin="2,2,2,2" IsEnabled="{Binding IsRunning}"/>
-                    <TextBlock Text="regelaar" FontSize="15" Foreground="Black" Margin="2,0,2,0"/>
-                    <Button Background="Black" Width="20" Height="20" Margin="2,2,2,2" IsEnabled="{Binding IsRunning}"/>
+                    <Button Background="Red" Width="20" Height="20" Margin="2,2,2,2" IsEnabled="{Binding IsRunning}"  Command="{Binding StapSprongCommand}"/>
+ 
                     <TextBlock Text="Seriële communicatie" FontSize="15" Foreground="Orange" Margin="2,0,2,0"/>
-                    <Button Background="Orange" Width="20" Height="20" Margin="2,2,2,2" IsEnabled="{Binding IsRunning}"/>
+                    <Button Background="Orange" Width="20" Height="20" Margin="2,2,2,2" IsEnabled="{Binding IsRunning}" Command="{Binding SerialCommCommand}"/>
                 </WrapPanel>
             </Border>
         </Grid>

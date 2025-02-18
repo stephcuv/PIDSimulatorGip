@@ -1,4 +1,5 @@
-﻿using System;
+﻿using PIDSimulatorGip.viewmodel;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -22,6 +23,8 @@ namespace PIDSimulatorGip.view
         public NewMainWindow()
         {
             InitializeComponent();
+            MainSimulationViewModel vm = new MainSimulationViewModel();
+            DataContext = vm;
         }
     }
 }

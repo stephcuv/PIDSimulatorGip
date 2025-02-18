@@ -5,7 +5,6 @@ using OxyPlot.Series;
 using PIDSimulatorGip.model;
 using PIDSimulatorGip.MVVM;
 using System.Diagnostics;
-using System.Diagnostics.Eventing.Reader;
 using System.Windows;
 using System.Windows.Threading;
 
@@ -89,10 +88,12 @@ namespace PIDSimulatorGip.viewmodel
         private Visibility _procesVisiblity = Visibility.Visible;
         private Visibility _serialVisibility = Visibility.Collapsed;
         private Visibility _stapsprongVisibility = Visibility.Collapsed;
+        private Visibility _simulatieSnelheidVisibility = Visibility.Visible;
         public Visibility RegelaarVisibility { set { _regelaarVisibility = value; OnPropertyChanged(); } get { return _regelaarVisibility; } }
         public Visibility ProcesVisibility { set { _procesVisiblity = value; OnPropertyChanged(); } get { return _procesVisiblity; } }
         public Visibility SerialVisibility { set { _serialVisibility = value; OnPropertyChanged(); } get { return _serialVisibility; } }
         public Visibility StapsprongVisibility { set { _stapsprongVisibility = value; OnPropertyChanged(); } get { return _stapsprongVisibility; } }
+        public Visibility SimulatieSnelheidVisibility { set { _simulatieSnelheidVisibility = value; OnPropertyChanged(); } get { return _simulatieSnelheidVisibility; } }
 
         #endregion
         private void StartSimulation()
@@ -182,6 +183,7 @@ namespace PIDSimulatorGip.viewmodel
             _serialComSimStatus = !_serialComSimStatus;
             SerialVisibility = (SerialVisibility == Visibility.Visible) ? Visibility.Collapsed : Visibility.Visible;
             ProcesVisibility = (ProcesVisibility == Visibility.Visible) ? Visibility.Collapsed : Visibility.Visible;
+            SimulatieSnelheidVisibility = (SimulatieSnelheidVisibility == Visibility.Visible) ? Visibility.Collapsed : Visibility.Visible;
         }
         private void Timer_Tick(object? sender, EventArgs e)
         {
