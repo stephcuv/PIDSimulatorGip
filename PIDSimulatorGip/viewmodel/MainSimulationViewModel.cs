@@ -27,6 +27,7 @@ namespace PIDSimulatorGip.viewmodel
         private double _simulatieSnelheid;
 
         private double _stapsprongWaarde = 0;
+        private double _stapsprongChangeWaarde = 0;
 
 
         public MainSimulationViewModel()
@@ -57,6 +58,8 @@ namespace PIDSimulatorGip.viewmodel
         public double SimulatieSnelheid { set { _simulatieSnelheid = Math.Round(value, 2); OnPropertyChanged(); } get { return _simulatieSnelheid; } }
 
         public double StapsprongWaarde { set { _stapsprongWaarde = Math.Round(value, 2); OnPropertyChanged(); } get { return _stapsprongWaarde; } }
+        public double StapsprongChangeWaarde { set { _stapsprongChangeWaarde = Math.Round(value, 2); OnPropertyChanged(); } get { return _stapsprongChangeWaarde; } }
+
         #region simulation status
 
         private bool _isRunning;
