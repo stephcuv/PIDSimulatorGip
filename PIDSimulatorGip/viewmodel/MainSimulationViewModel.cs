@@ -4,12 +4,14 @@ using OxyPlot.Legends;
 using OxyPlot.Series;
 using PIDSimulatorGip.model;
 using PIDSimulatorGip.MVVM;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Windows;
 using System.Windows.Threading;
 
 namespace PIDSimulatorGip.viewmodel
 {
+
     internal class MainSimulationViewModel : ViewModelBase
     {
 
@@ -24,10 +26,7 @@ namespace PIDSimulatorGip.viewmodel
 
         private double _currentXaxis = 0;
 
-        private double _simulatieSnelheid;
-
-        private double _stapsprongWaarde = 0;
-        private double _stapsprongChangeWaarde = 0;
+        private double _simulatieSnelheid = 0.5;
 
 
         public MainSimulationViewModel()
@@ -55,17 +54,23 @@ namespace PIDSimulatorGip.viewmodel
 
 
         public PlotModel MyPlot { get { return _myPlot; } set { _myPlot = value; OnPropertyChanged(); } }
-        public double SimulatieSnelheid { set { _simulatieSnelheid = Math.Round(value, 2); OnPropertyChanged(); } get { return _simulatieSnelheid; } }
 
+        #region stapsprong
+        private double _stapsprongWaarde = 0;
+        private double _stapsprongChangeWaarde = 0;
         public double StapsprongWaarde { set { _stapsprongWaarde = Math.Round(value, 2); OnPropertyChanged(); } get { return _stapsprongWaarde; } }
         public double StapsprongChangeWaarde { set { _stapsprongChangeWaarde = Math.Round(value, 2); OnPropertyChanged(); } get { return _stapsprongChangeWaarde; } }
 
+        #endregion
+
+        
         #region simulation status
 
         private bool _isRunning;
         private bool _standardSimStatus;
         private bool _serialComSimStatus;
-        private bool _stapsprongSimStatus;
+        private bool _stapsprongSimStatus;        
+        public double SimulatieSnelheid { set { _simulatieSnelheid = Math.Round(value, 2); OnPropertyChanged(); } get { return _simulatieSnelheid; } }
         public bool IsRunning { get { return !_isRunning; } set { _isRunning = value; OnPropertyChanged(); } }
         public bool SerialComActive { set { _serialComSimStatus = value; OnPropertyChanged(); } get { return _serialComSimStatus; } }
         public bool Stapsprong { set { _stapsprongSimStatus = value; OnPropertyChanged(); } get { return _stapsprongSimStatus; } }
@@ -98,7 +103,49 @@ namespace PIDSimulatorGip.viewmodel
         public Visibility StapsprongVisibility { set { _stapsprongVisibility = value; OnPropertyChanged(); } get { return _stapsprongVisibility; } }
         public Visibility SimulatieSnelheidVisibility { set { _simulatieSnelheidVisibility = value; OnPropertyChanged(); } get { return _simulatieSnelheidVisibility; } }
 
+        private void StapsprongGridVisibility()
+        {
+            _stapsprongSimStatus = !_stapsprongSimStatus;
+            RegelaarVisibility = (RegelaarVisibility == Visibility.Visible) ? Visibility.Collapsed : Visibility.Visible;
+            StapsprongVisibility = (StapsprongVisibility == Visibility.Visible) ? Visibility.Collapsed : Visibility.Visible;
+        }
+
+        private void SerialCommGridVisibility()
+        {
+            _serialComSimStatus = !_serialComSimStatus;
+            SerialVisibility = (SerialVisibility == Visibility.Visible) ? Visibility.Collapsed : Visibility.Visible;
+            ProcesVisibility = (ProcesVisibility == Visibility.Visible) ? Visibility.Collapsed : Visibility.Visible;
+            SimulatieSnelheidVisibility = (SimulatieSnelheidVisibility == Visibility.Visible) ? Visibility.Collapsed : Visibility.Visible;
+        }
         #endregion
+
+        #region multipliers
+        private enum multiplier
+        {
+            [Description("1x")]
+            OneX = 1,
+
+            [Description("10x")]
+            TenX = 10,
+
+            [Description("100x")]
+            HundredX = 100
+        }
+        private multiplier _VSFPMultiplier = multiplier.OneX;
+        private multiplier _VSFIMultiplier = multiplier.OneX;
+        private multiplier _VSFDMultiplier = multiplier.OneX;
+        private multiplier _procesKrachtMultiplier = multiplier.OneX;
+        private multiplier _tijdsconsteMultiPlier = multiplier.OneX;
+
+        private multiplier VSFPMultiplier {set { _VSFPMultiplier = value; OnPropertyChanged(); } get { return _VSFPMultiplier; } }
+        private multiplier VSFIMultiplier { set { _VSFIMultiplier = value; OnPropertyChanged(); } get { return _VSFIMultiplier; } }
+        private multiplier VSFDMultiplier { set { _VSFDMultiplier = value; OnPropertyChanged(); } get { return _VSFDMultiplier; } }
+        private multiplier ProcesKrachtMultiplier { set { _procesKrachtMultiplier = value; OnPropertyChanged(); } get { return _procesKrachtMultiplier; } }
+        private multiplier TijdsconstanteMultiplier { set { _tijdsconsteMultiPlier = value; OnPropertyChanged(); } get { return _tijdsconsteMultiPlier; } }
+
+        #endregion
+
+        #region simulation control functions 
         private void StartSimulation()
         {
             if (!_stapsprongSimStatus && !_serialComSimStatus)
@@ -174,20 +221,7 @@ namespace PIDSimulatorGip.viewmodel
             ProcesWaarde = 0;
             SimulatieSnelheid = 0.5;
         }
-        private void StapsprongGridVisibility()
-        {
-            _stapsprongSimStatus = !_stapsprongSimStatus;
-            RegelaarVisibility = (RegelaarVisibility == Visibility.Visible) ? Visibility.Collapsed : Visibility.Visible;
-            StapsprongVisibility = (StapsprongVisibility == Visibility.Visible) ? Visibility.Collapsed : Visibility.Visible;
-        }
-
-        private void SerialCommGridVisibility()
-        {
-            _serialComSimStatus = !_serialComSimStatus;
-            SerialVisibility = (SerialVisibility == Visibility.Visible) ? Visibility.Collapsed : Visibility.Visible;
-            ProcesVisibility = (ProcesVisibility == Visibility.Visible) ? Visibility.Collapsed : Visibility.Visible;
-            SimulatieSnelheidVisibility = (SimulatieSnelheidVisibility == Visibility.Visible) ? Visibility.Collapsed : Visibility.Visible;
-        }
+     
         private void Timer_Tick(object? sender, EventArgs e)
         {
             if (_stapsprongSimStatus)
@@ -207,7 +241,8 @@ namespace PIDSimulatorGip.viewmodel
                 GraphAdd();
             }
         }
-
+        #endregion
+        #region graph
         private void GraphAdd()
         {
             if (MyPlot.Series.Count == 0)
@@ -284,5 +319,6 @@ namespace PIDSimulatorGip.viewmodel
 
             MyPlot.InvalidatePlot(false);
         }
+        #endregion
     }
 }
