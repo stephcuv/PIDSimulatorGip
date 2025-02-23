@@ -76,9 +76,9 @@ namespace PIDSimulatorGip.viewmodel
         public bool Stapsprong { set { _stapsprongSimStatus = value; OnPropertyChanged(); } get { return _stapsprongSimStatus; } }
         #endregion
         #region pid regelaar 
-        public double VSFP { get { return _RGLR.VSFP; } set { _RGLR.VSFP = Math.Round(value, 3) * Convert.ToInt16(_VSFPMultiplier); OnPropertyChanged(); } }
-        public double VSFI { get { return _RGLR.VSFI; } set { _RGLR.VSFI = Math.Round(value, 3) * Convert.ToInt16(_VSFIMultiplier); OnPropertyChanged(); } }
-        public double VSFD { get { return _RGLR.VSFD; } set { _RGLR.VSFD = Math.Round(value, 3) * Convert.ToInt16(_VSFDMultiplier); OnPropertyChanged(); } }
+        public double VSFP { get { return _RGLR.VSFP; } set { _RGLR.VSFP = Math.Round(value, 3); OnPropertyChanged(); } }
+        public double VSFI { get { return _RGLR.VSFI; } set { _RGLR.VSFI = Math.Round(value, 3); OnPropertyChanged(); } }
+        public double VSFD { get { return _RGLR.VSFD; } set { _RGLR.VSFD = Math.Round(value, 3); OnPropertyChanged(); } }
         public double W { get { return _RGLR.W; } set { _RGLR.W = Math.Round(value, 2); OnPropertyChanged(); } }
         public double TijdsConstante { set { _RGLR.Tijdsconstante = Math.Round(value, 2); _proces.Tijdsconstante = Math.Round(value, 2); OnPropertyChanged(); } get { return _RGLR.Tijdsconstante; } }
         public string Type { set { _RGLR.Type = value; OnPropertyChanged(); } get { return _RGLR.Type; } }
@@ -119,7 +119,7 @@ namespace PIDSimulatorGip.viewmodel
         }
         #endregion
 
-        #region multipliers
+        #region multipliers slider
         public enum multiplier
         {
             OneX = 1,
@@ -130,13 +130,19 @@ namespace PIDSimulatorGip.viewmodel
         private multiplier _VSFIMultiplier = multiplier.OneX;
         private multiplier _VSFDMultiplier = multiplier.OneX;
         private multiplier _procesKrachtMultiplier = multiplier.OneX;
-        private multiplier _tijdsconsteMultiPlier = multiplier.OneX;
+        private multiplier _tijdsconsteMultiplier = multiplier.OneX;
 
-        public multiplier VSFPMultiplier {set { _VSFPMultiplier = value; OnPropertyChanged(); } get { return _VSFPMultiplier; } }
-        public multiplier VSFIMultiplier { set { _VSFIMultiplier = value; OnPropertyChanged(); } get { return _VSFIMultiplier; } }
-        public multiplier VSFDMultiplier { set { _VSFDMultiplier = value; OnPropertyChanged(); } get { return _VSFDMultiplier; } }
-        public multiplier ProcesKrachtMultiplier { set { _procesKrachtMultiplier = value; OnPropertyChanged(); } get { return _procesKrachtMultiplier; } }
-        public multiplier TijdsconstanteMultiplier { set { _tijdsconsteMultiPlier = value; OnPropertyChanged(); } get { return _tijdsconsteMultiPlier; } }
+        public multiplier VSFPMultiplier {set { _VSFPMultiplier = value; OnPropertyChanged(); OnPropertyChanged(nameof(VSFPMAXvalue));} get { return _VSFPMultiplier; } }
+        public multiplier VSFIMultiplier { set { _VSFIMultiplier = value; OnPropertyChanged(); OnPropertyChanged(nameof(VSFIMaxValue)); } get { return _VSFIMultiplier; } }
+        public multiplier VSFDMultiplier { set { _VSFDMultiplier = value; OnPropertyChanged(); OnPropertyChanged(nameof(VSFDMaxValue)); } get { return _VSFDMultiplier; } }
+        public multiplier ProcesKrachtMultiplier { set { _procesKrachtMultiplier = value; OnPropertyChanged(); OnPropertyChanged(nameof(ProcesKrachtMaxValue)); } get { return _procesKrachtMultiplier; } }
+        public multiplier TijdsconstanteMultiplier { set { _tijdsconsteMultiplier = value; OnPropertyChanged(); OnPropertyChanged(nameof(TijdsconstanteMaxValue)); } get { return _tijdsconsteMultiplier; } }
+
+        public double VSFPMAXvalue { get {return 0.5 * Convert.ToDouble(_VSFPMultiplier); } }
+        public double VSFIMaxValue { get { return 0.5 * Convert.ToDouble(_VSFIMultiplier); } }
+        public double VSFDMaxValue { get { return 0.5 * Convert.ToDouble(_VSFDMultiplier); } }
+        public double ProcesKrachtMaxValue { get { return 0.5 * Convert.ToDouble(_procesKrachtMultiplier); } }
+        public double TijdsconstanteMaxValue { get { return 0.5 * Convert.ToDouble(_tijdsconsteMultiplier); } }
 
         #endregion
 
