@@ -6,6 +6,7 @@ using PIDSimulatorGip.model;
 using PIDSimulatorGip.MVVM;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.IO.Ports;
 using System.Windows;
 using System.Windows.Threading;
 
@@ -19,6 +20,7 @@ namespace PIDSimulatorGip.viewmodel
         private ProcesBerekening _proces;
         private DispatcherTimer _timer;
         private PlotModel? _myPlot;
+        private SerialCommunication _serial;
 
 
         private double _rglrWaarde = 0; //waarde van de regelaar op dit moment
@@ -45,14 +47,14 @@ namespace PIDSimulatorGip.viewmodel
 
             _timer.Tick += Timer_Tick;
         }
+
         public RelayCommand StartCommand => new RelayCommand(execute => { StartSimulation(); }, canExecute => { return !_isRunning; });
         public RelayCommand ResetCommand => new RelayCommand(execute => { ResetSimulation(); }, canExecute => { return _isRunning; });
         public RelayCommand PauzeCommand => new RelayCommand(exectue => { PauseSimulation(); }, canExecute => { return _isRunning; });
 
-        public RelayCommand StapSprongCommand => new RelayCommand(execute => { StapsprongGridVisibility(); }, canExecute => { return !_isRunning && !_serialComSimStatus; });
-        public RelayCommand SerialCommCommand => new RelayCommand(execute => { SerialCommGridVisibility(); }, canExecute => { return !_isRunning && !_stapsprongSimStatus; });
-
-
+        public RelayCommand StapsprongCommand => new RelayCommand(execute => { StapsprongGridVisibility(); }, canExecute => { return !_isRunning && !_serialComSimStatus; });
+        public RelayCommand SerialCommCommand => new RelayCommand(execute => { SerialCommGridVisibility(); Serial(); }, canExecute => { return !_isRunning && !_stapsprongSimStatus; });
+        public RelayCommand StartStapsprongCommand => new RelayCommand(execute => { StartStapsprongFunction(); }, canExecute => { return _isRunning; });
         public PlotModel MyPlot { get { return _myPlot; } set { _myPlot = value; OnPropertyChanged(); } }
 
         #region stapsprong
@@ -61,15 +63,30 @@ namespace PIDSimulatorGip.viewmodel
         public double StapsprongWaarde { set { _stapsprongWaarde = Math.Round(value, 2); OnPropertyChanged(); } get { return _stapsprongWaarde; } }
         public double StapsprongChangeWaarde { set { _stapsprongChangeWaarde = Math.Round(value, 2); OnPropertyChanged(); } get { return _stapsprongChangeWaarde; } }
 
+
+        private void StartStapsprongFunction()
+        {
+            if ((_stapsprongWaarde + _stapsprongChangeWaarde) > 100)
+            {
+                StapsprongWaarde = 100;
+            }
+            else if ((_stapsprongWaarde + _stapsprongChangeWaarde) < 0)
+            {
+                StapsprongWaarde = 0;
+            }
+            else
+            {
+                StapsprongWaarde = _stapsprongWaarde + _stapsprongChangeWaarde;
+            }
+        }
         #endregion
 
-        
         #region simulation status
 
         private bool _isRunning;
         private bool _standardSimStatus;
         private bool _serialComSimStatus;
-        private bool _stapsprongSimStatus;        
+        private bool _stapsprongSimStatus;
         public double SimulatieSnelheid { set { _simulatieSnelheid = Math.Round(value, 2); OnPropertyChanged(); } get { return _simulatieSnelheid; } }
         public bool IsRunning { get { return !_isRunning; } set { _isRunning = value; OnPropertyChanged(); } }
         public bool SerialComActive { set { _serialComSimStatus = value; OnPropertyChanged(); } get { return _serialComSimStatus; } }
@@ -80,7 +97,7 @@ namespace PIDSimulatorGip.viewmodel
         public double VSFI { get { return _RGLR.VSFI; } set { _RGLR.VSFI = Math.Round(value, 3); OnPropertyChanged(); } }
         public double VSFD { get { return _RGLR.VSFD; } set { _RGLR.VSFD = Math.Round(value, 3); OnPropertyChanged(); } }
         public double W { get { return _RGLR.W; } set { _RGLR.W = Math.Round(value, 2); OnPropertyChanged(); } }
-        public double TijdsConstante { set { _RGLR.Tijdsconstante = Math.Round(value, 2); _proces.Tijdsconstante = Math.Round(value, 2); OnPropertyChanged(); } get { return _RGLR.Tijdsconstante; } }
+        public double TijdsConstante { set { _RGLR.Tijdsconstante = Math.Round(value, 5); _proces.Tijdsconstante = Math.Round(value, 5); OnPropertyChanged(); } get { return _RGLR.Tijdsconstante; } }
         public string Type { set { _RGLR.Type = value; OnPropertyChanged(); } get { return _RGLR.Type; } }
 
         #endregion
@@ -88,9 +105,45 @@ namespace PIDSimulatorGip.viewmodel
         public double Kracht { set { _proces.Kracht = Math.Round(value, 2); OnPropertyChanged(); } get { return _proces.Kracht; } }
         public string DodeTijd { set { _proces.DodeTijd = value; OnPropertyChanged(); } get { return _proces.DodeTijd; } }
         public string Orde { set { _proces.Orde = value; OnPropertyChanged(); } get { return _proces.Orde; } }
-
         public double ProcesWaarde { private set { _procesWaarde = value; OnPropertyChanged(); } get { return _procesWaarde * 3; } }
         #endregion
+        #region serial communication     
+        private bool _serialSubscribed = false;
+        private void Serial()
+        {
+            Stopwatch stopwatch = new Stopwatch();
+            if (_serial == null)
+            {
+                _serial = new SerialCommunication();
+            }
+            _serial.ConnectSerPort();
+            if (!_serialSubscribed)
+            {
+                _serial.DataReceived += (sender, data) =>
+                {
+                    if (_isRunning)
+                    {
+                        stopwatch.Stop();
+                        TijdsConstante = stopwatch.ElapsedMilliseconds;
+                        _procesWaarde = Convert.ToDouble(_serial.IncomeData);
+                        _RGLR.X = _procesWaarde;
+                        _rglrWaarde = _RGLR.Berekening();
+                        Application.Current.Dispatcher.Invoke(() =>
+                        {
+                            GraphAdd();
+                        });
+                        _serial.SendSerialData($"{_rglrWaarde}");
+                        stopwatch.Restart();
+                    }
+                };
+                _serialSubscribed = true;
+            }
+
+        }
+        #endregion
+
+
+
         #region ui grid visibility 
         private Visibility _regelaarVisibility = Visibility.Visible;
         private Visibility _procesVisiblity = Visibility.Visible;
@@ -119,7 +172,7 @@ namespace PIDSimulatorGip.viewmodel
         }
         #endregion
 
-        #region multipliers slider
+        #region multiplier
         public enum multiplier
         {
             OneX = 1,
@@ -132,13 +185,13 @@ namespace PIDSimulatorGip.viewmodel
         private multiplier _procesKrachtMultiplier = multiplier.OneX;
         private multiplier _tijdsconsteMultiplier = multiplier.OneX;
 
-        public multiplier VSFPMultiplier {set { _VSFPMultiplier = value; OnPropertyChanged(); OnPropertyChanged(nameof(VSFPMAXvalue));} get { return _VSFPMultiplier; } }
+        public multiplier VSFPMultiplier { set { _VSFPMultiplier = value; OnPropertyChanged(); OnPropertyChanged(nameof(VSFPMAXvalue)); } get { return _VSFPMultiplier; } }
         public multiplier VSFIMultiplier { set { _VSFIMultiplier = value; OnPropertyChanged(); OnPropertyChanged(nameof(VSFIMaxValue)); } get { return _VSFIMultiplier; } }
         public multiplier VSFDMultiplier { set { _VSFDMultiplier = value; OnPropertyChanged(); OnPropertyChanged(nameof(VSFDMaxValue)); } get { return _VSFDMultiplier; } }
         public multiplier ProcesKrachtMultiplier { set { _procesKrachtMultiplier = value; OnPropertyChanged(); OnPropertyChanged(nameof(ProcesKrachtMaxValue)); } get { return _procesKrachtMultiplier; } }
         public multiplier TijdsconstanteMultiplier { set { _tijdsconsteMultiplier = value; OnPropertyChanged(); OnPropertyChanged(nameof(TijdsconstanteMaxValue)); } get { return _tijdsconsteMultiplier; } }
 
-        public double VSFPMAXvalue { get {return 0.5 * Convert.ToDouble(_VSFPMultiplier); } }
+        public double VSFPMAXvalue { get { return 0.5 * Convert.ToDouble(_VSFPMultiplier); } }
         public double VSFIMaxValue { get { return 0.5 * Convert.ToDouble(_VSFIMultiplier); } }
         public double VSFDMaxValue { get { return 0.5 * Convert.ToDouble(_VSFDMultiplier); } }
         public double ProcesKrachtMaxValue { get { return 0.5 * Convert.ToDouble(_procesKrachtMultiplier); } }
@@ -151,7 +204,7 @@ namespace PIDSimulatorGip.viewmodel
         {
             if (!_stapsprongSimStatus && !_serialComSimStatus)
             {
-                if ((TijdsConstante > 0) && (Kracht > 0) && !string.IsNullOrEmpty(DodeTijd) && !string.IsNullOrEmpty(Orde) && !string.IsNullOrEmpty(Type))
+                if ((TijdsConstante > 0) && (Kracht > 0) && !string.IsNullOrEmpty(DodeTijd) && !string.IsNullOrEmpty(Orde) && !string.IsNullOrEmpty(Type) && (VSFP != 0 || VSFI != 0 || VSFD != 0))
                 {
                     IsRunning = true;
                     _standardSimStatus = true;
@@ -161,7 +214,6 @@ namespace PIDSimulatorGip.viewmodel
                 else
                 {
                     IsRunning = false;
-                    _standardSimStatus = false;
                 }
             }
             else if (_stapsprongSimStatus)
@@ -177,18 +229,30 @@ namespace PIDSimulatorGip.viewmodel
                     IsRunning = false;
                 }
             }
+            else if (_serialComSimStatus)
+            {
+                if (!string.IsNullOrEmpty(Type) && _serial.Connected && (VSFP != 0 || VSFI != 0 || VSFD != 0))
+                {
+                    IsRunning = true;
+                    _serial.SendSerialData($"{_RGLR.Berekening()}");
+                }
+                else
+                {
+                    IsRunning = false;
+                }
+            }
 
         }
         private void PauseSimulation()
         {
             IsRunning = false;
-            _timer.Stop();
+            if (!_serialComSimStatus) _timer.Stop();
         }
 
         private void ResetSimulation()
         {
             IsRunning = false;
-            _timer.Stop();
+            if (!_serialComSimStatus) _timer.Stop();
 
             var rglrWaardes = MyPlot.Series[0] as LineSeries;
             var procesWaardes = MyPlot.Series[1] as LineSeries;
@@ -222,17 +286,13 @@ namespace PIDSimulatorGip.viewmodel
             ProcesWaarde = 0;
             SimulatieSnelheid = 0.5;
         }
-     
+
         private void Timer_Tick(object? sender, EventArgs e)
         {
             if (_stapsprongSimStatus)
             {
                 ProcesWaarde = _proces.Proces(_stapsprongWaarde);
                 GraphAdd();
-            }
-            else if (_serialComSimStatus)
-            {
-
             }
             else
             {
@@ -259,9 +319,18 @@ namespace PIDSimulatorGip.viewmodel
 
                 if (_standardSimStatus || _serialComSimStatus)
                 {
-                    MyPlot.Series.Add(new LineSeries { Title = "Regelaar Waarde", TrackerFormatString = "tijdstip: {2:0} sec\n" + "regelaar Waarde: {4:0.00}" });
-                    MyPlot.Series.Add(new LineSeries { Title = "Proces Waarde", TrackerFormatString = "tijdstip: {2:0} sec\n" + "proces Waarde: {4:0.00}" });
-                    MyPlot.Series.Add(new LineSeries { Title = "Wenswaarde", TrackerFormatString = "tijdstip: {2:0} sec\n" + "wens Waarde: {4:0.00}" });
+                    if (_standardSimStatus)
+                    {
+                        MyPlot.Series.Add(new LineSeries { Title = "Regelaar Waarde", TrackerFormatString = "tijdstip: {2:0} sec\n" + "regelaar Waarde: {4:0.00}" });
+                        MyPlot.Series.Add(new LineSeries { Title = "Proces Waarde", TrackerFormatString = "tijdstip: {2:0} sec\n" + "proces Waarde: {4:0.00}" });
+                        MyPlot.Series.Add(new LineSeries { Title = "Wenswaarde", TrackerFormatString = "tijdstip: {2:0} sec\n" + "wens Waarde: {4:0.00}" });
+                    }
+                    else
+                    {
+                        MyPlot.Series.Add(new LineSeries { Title = "Regelaar Waarde", TrackerFormatString = "tijdstip: {2:0} millisec\n" + "regelaar Waarde: {4:0.00}" });
+                        MyPlot.Series.Add(new LineSeries { Title = "Proces Waarde", TrackerFormatString = "tijdstip: {2:0} millisec\n" + "proces Waarde: {4:0.00}" });
+                        MyPlot.Series.Add(new LineSeries { Title = "Wenswaarde", TrackerFormatString = "tijdstip: {2:0} millisec\n" + "wens Waarde: {4:0.00}" });
+                    }
                 }
                 else if (_stapsprongSimStatus)
                 {
@@ -285,11 +354,20 @@ namespace PIDSimulatorGip.viewmodel
                 procesWaardes.Points.Add(new DataPoint(_currentXaxis, _procesWaarde));
                 wensWaardes.Points.Add(new DataPoint(_currentXaxis, W));
 
-
-                if (rglrWaardes.Points.Count > 100) rglrWaardes.Points.RemoveAt(0);
-                if (procesWaardes.Points.Count > 100) procesWaardes.Points.RemoveAt(0);
-                if (wensWaardes.Points.Count > 100) wensWaardes.Points.RemoveAt(0);
+                if (_standardSimStatus)
+                {
+                    if (rglrWaardes.Points.Count > 100) rglrWaardes.Points.RemoveAt(0);
+                    if (procesWaardes.Points.Count > 100) procesWaardes.Points.RemoveAt(0);
+                    if (wensWaardes.Points.Count > 100) wensWaardes.Points.RemoveAt(0);
+                }
+                else
+                {
+                    if (rglrWaardes.Points.Count > 100) rglrWaardes.Points.RemoveAt(0);
+                    if (procesWaardes.Points.Count > 100) procesWaardes.Points.RemoveAt(0);
+                    if (wensWaardes.Points.Count > 100) wensWaardes.Points.RemoveAt(0);
+                }
             }
+
 
             else if (_stapsprongSimStatus)
             {
@@ -313,7 +391,8 @@ namespace PIDSimulatorGip.viewmodel
             var xAxis = MyPlot.Axes.FirstOrDefault(a => a.Position == AxisPosition.Bottom);
             if (xAxis != null)
             {
-                xAxis.Minimum = _currentXaxis - (100 * TijdsConstante); // Keeps last 100 points visible
+               if(!_serialComSimStatus) xAxis.Minimum = _currentXaxis - (100 * TijdsConstante); // Keeps last 100 points visible
+               else xAxis.Minimum = _currentXaxis - (500 * TijdsConstante);
                 xAxis.Maximum = _currentXaxis;
             }
 

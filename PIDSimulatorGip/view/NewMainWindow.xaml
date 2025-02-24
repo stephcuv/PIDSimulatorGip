@@ -54,7 +54,7 @@
                                 <RadioButton IsChecked="{Binding VSFPMultiplier,Converter={StaticResource EnumToBoolConverter}, ConverterParameter=HundredX}" GroupName="VSFP"  VerticalAlignment="Center"/>
                                 <TextBlock Text="x100" FontSize="15" Foreground="Black" Margin="0,0,10,0"/>
 
-                                <TextBlock FontSize="15" Foreground="Black" Text="{Binding VSFP, StringFormat=F3}"/>
+                                <TextBlock FontSize="15" Foreground="Black" Text="{Binding VSFP, StringFormat=F3}" Margin="3,0"/>
                             </WrapPanel>
                             <WrapPanel HorizontalAlignment="Center">
                                 <TextBlock FontSize="15" Foreground="Black" Text="I - actie waarde "/>
@@ -72,7 +72,7 @@
                                 <RadioButton IsChecked="{Binding VSFIMultiplier, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=HundredX}" GroupName="VSFI"  VerticalAlignment="Center"/>
                                 <TextBlock Text="x100" FontSize="15" Foreground="Black" Margin="0,0,10,0"/>
 
-                                <TextBlock FontSize="15" Foreground="Black" Text="{Binding VSFI, StringFormat=F3}"/>
+                                <TextBlock FontSize="15" Foreground="Black" Text="{Binding VSFI, StringFormat=F3}" Margin="3,0"/>
                             </WrapPanel>
                             <WrapPanel HorizontalAlignment="Center">
                                 <TextBlock FontSize="15" Foreground="Black" Text="D - actie waarde "/>
@@ -90,7 +90,7 @@
                                 <RadioButton IsChecked="{Binding VSFDMultiplier, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=HundredX}" GroupName="VSFD"  VerticalAlignment="Center"/>
                                 <TextBlock Text="x100" FontSize="15" Foreground="Black" Margin="0,0,10,0"/>
 
-                                <TextBlock FontSize="15" Foreground="Black" Text="{Binding VSFD, StringFormat=F3}"/>
+                                <TextBlock FontSize="15" Foreground="Black" Text="{Binding VSFD, StringFormat=F3}" Margin="3,0"/>
                             </WrapPanel>
                         </StackPanel>
                     </Border>
@@ -109,10 +109,10 @@
                             <Slider Minimum="0" Maximum="100" Value="{Binding StapsprongWaarde}"/>
                             <WrapPanel HorizontalAlignment="Center">
                                 <TextBlock FontSize="15" Foreground="Red" Text="spong waarde "/>
-                                <TextBlock FontSize="15" Foreground="Red" Text="{Binding StapsprongChangeWaarde, StringFormat=F2}"/>
+                                <TextBlock FontSize="15" Foreground="Red" Text="{Binding StapsprongChangeWaarde, StringFormat=F2}" Margin="3,0"/>
                             </WrapPanel>
                             <Slider Minimum="-50" Maximum="50" Value="{Binding StapsprongChangeWaarde}"/>
-                            <Button Content="start" FontSize="15" Foreground="Red" Background="White" BorderThickness="1" BorderBrush="Red" Margin="2"/>
+                            <Button Content="start" Command="{Binding StartStapsprongCommand}" FontSize="15" Foreground="Red" Background="White" BorderThickness="1" BorderBrush="Red" Margin="2"/>
                         </StackPanel>
                     </Border>
                 </Grid>
@@ -188,19 +188,19 @@
                     <TextBlock Text="{Binding TijdsConstante, StringFormat=F3}" FontSize="15" Foreground="Green" Margin="10,0,2,0"/>
                     </WrapPanel>
                     <WrapPanel Grid.Row="1" Grid.Column="1" HorizontalAlignment="Center">
-                        <RadioButton IsChecked="{Binding ProcesKrachtMultiplier, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=OneX}" GroupName="ProcesKracht" VerticalAlignment="Center"/>
-                        <TextBlock Text="x1" FontSize="15" Foreground="Green"/>
-                        <RadioButton IsChecked="{Binding ProcesKrachtMultiplier, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=TenX}" GroupName="ProcesKracht"  VerticalAlignment="Center"/>
-                        <TextBlock Text="x10" FontSize="15" Foreground="Green"/>
-                        <RadioButton IsChecked="{Binding ProcesKrachtMultiplier, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=HundredX}" GroupName="ProcesKracht"  VerticalAlignment="Center"/>
-                        <TextBlock Text="x100" FontSize="15" Foreground="Green"/>
-                    </WrapPanel>
-                    <WrapPanel Grid.Row="1" HorizontalAlignment="Center">
                         <RadioButton IsChecked="{Binding TijdsconstanteMultiplier, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=OneX}" GroupName="TijdConstanteRB" VerticalAlignment="Center"/>
-                        <TextBlock Text="x1" FontSize="15" Foreground="Green" Margin="0,0,0,5"/>
+                        <TextBlock Text="x1" FontSize="15" Foreground="Green"/>
                         <RadioButton IsChecked="{Binding TijdsconstanteMultiplier, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=TenX}" GroupName="TijdConstanteRB"  VerticalAlignment="Center"/>
                         <TextBlock Text="x10" FontSize="15" Foreground="Green"/>
                         <RadioButton IsChecked="{Binding TijdsconstanteMultiplier, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=HundredX}" GroupName="TijdConstanteRB"  VerticalAlignment="Center"/>
+                        <TextBlock Text="x100" FontSize="15" Foreground="Green"/>
+                    </WrapPanel>
+                    <WrapPanel Grid.Row="1" HorizontalAlignment="Center">
+                        <RadioButton IsChecked="{Binding ProcesKrachtMultiplier, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=OneX}" GroupName="ProcesKracht" VerticalAlignment="Center"/>
+                        <TextBlock Text="x1" FontSize="15" Foreground="Green" Margin="0,0,0,5"/>
+                        <RadioButton IsChecked="{Binding ProcesKrachtMultiplier, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=TenX}" GroupName="ProcesKracht"  VerticalAlignment="Center"/>
+                        <TextBlock Text="x10" FontSize="15" Foreground="Green"/>
+                        <RadioButton IsChecked="{Binding ProcesKrachtMultiplier, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=HundredX}" GroupName="ProcesKracht"  VerticalAlignment="Center"/>
                         <TextBlock Text="x100" FontSize="15" Foreground="Green"/>
                     </WrapPanel>
                     <WrapPanel Grid.Row="2">
@@ -273,7 +273,7 @@
             <Border Margin="2" BorderBrush="RoyalBlue" BorderThickness="2">
                 <WrapPanel HorizontalAlignment="Center">
                     <TextBlock Text="stapsprong" FontSize="15" Foreground="Red" Margin="2,0,2,0"/>
-                    <Button Background="Red" Width="20" Height="20" Margin="2,2,2,2" IsEnabled="{Binding IsRunning}"  Command="{Binding StapSprongCommand}"/>
+                    <Button Background="Red" Width="20" Height="20" Margin="2,2,2,2" IsEnabled="{Binding IsRunning}"  Command="{Binding StapsprongCommand}"/>
 
                     <TextBlock Text="Seriële communicatie" FontSize="15" Foreground="Orange" Margin="2,0,2,0"/>
                     <Button Background="Orange" Width="20" Height="20" Margin="2,2,2,2" IsEnabled="{Binding IsRunning}" Command="{Binding SerialCommCommand}"/>

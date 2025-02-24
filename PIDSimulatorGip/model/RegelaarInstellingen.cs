@@ -187,9 +187,9 @@ namespace PIDSimulatorGip.model
         private void TypeA()
         {
 
-            _pWaarde = _vsfP * (_foutWaardes[0] - _foutWaardes[1]);
-            _iWaarde = _vsfI * _foutWaardes[0] * _tijdsconstante;
-            _dWaarde = (_vsfD / _tijdsconstante) * (_foutWaardes[0] - (2 * _foutWaardes[1]) + _foutWaardes[2]);
+            if (_vsfP != 0) _pWaarde = _vsfP * (_foutWaardes[0] - _foutWaardes[1]);
+            if (_vsfI != 0) _iWaarde = _vsfI * _foutWaardes[0] * _tijdsconstante;
+             if(_vsfD != 0)_dWaarde = (_vsfD / _tijdsconstante) * (_foutWaardes[0] - (2 * _foutWaardes[1]) + _foutWaardes[2]);
 
                 double temp = _prevStuurWaarde + _pWaarde + _iWaarde + _dWaarde;
             if(temp < 0)
@@ -205,9 +205,9 @@ namespace PIDSimulatorGip.model
 
         private void TypeB()
         {
-            _pWaarde = _vsfP * (_foutWaardes[0] - _foutWaardes[1]);
-            _iWaarde = _vsfI * _foutWaardes[0] * _tijdsconstante;
-            _dWaarde = (_vsfD / _tijdsconstante) * (_meetWaardes[0] - (2 * _meetWaardes[1]) + _meetWaardes[2]);
+           if (_vsfP != 0) _pWaarde = _vsfP * (_foutWaardes[0] - _foutWaardes[1]);
+           if (_vsfI != 0) _iWaarde = _vsfI * _foutWaardes[0] * _tijdsconstante;
+           if(_vsfD != 0) _dWaarde = (_vsfD / _tijdsconstante) * (_meetWaardes[0] - (2 * _meetWaardes[1]) + _meetWaardes[2]);
 
 
             double temp = _prevStuurWaarde + _pWaarde + _iWaarde - _dWaarde;
@@ -224,9 +224,9 @@ namespace PIDSimulatorGip.model
 
         private void TypeC()
         {
-            _pWaarde = _vsfP * (_meetWaardes[0] - _meetWaardes[1]);
-            _iWaarde = _vsfI * Fout() * _tijdsconstante;
-            _dWaarde = (_vsfD / _tijdsconstante) * (_meetWaardes[0] - (2 * _meetWaardes[1]) + _meetWaardes[2]);
+            if (_vsfP != 0) _pWaarde = _vsfP * (_meetWaardes[0] - _meetWaardes[1]);
+            if (_vsfI != 0) _iWaarde = _vsfI * Fout() * _tijdsconstante;
+            if (_vsfD != 0) _dWaarde = (_vsfD / _tijdsconstante) * (_meetWaardes[0] - (2 * _meetWaardes[1]) + _meetWaardes[2]);
 
 
             double temp = _prevStuurWaarde + _pWaarde + _iWaarde - _dWaarde;
