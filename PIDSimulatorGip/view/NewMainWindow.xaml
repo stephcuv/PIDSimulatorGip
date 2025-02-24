@@ -118,35 +118,35 @@
                 </Grid>
                 <!--#endregion-->
                 <!--#region simulationcontrol grid-->
-                <Grid>
+                <Grid Height="auto" Width="auto">
                     <Border BorderBrush="RoyalBlue" BorderThickness="2" Margin="10" >
                         <Grid HorizontalAlignment="Center">
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition/>
-                                <ColumnDefinition/>
-                                <ColumnDefinition/>
+                                <ColumnDefinition Width="auto"/>
+                                <ColumnDefinition Width="auto"/>
+                                <ColumnDefinition Width="auto"/>
                             </Grid.ColumnDefinitions>
                             <Grid.RowDefinitions>
-                                <RowDefinition/>
-                                <RowDefinition/>
-                                <RowDefinition/>
-                                <RowDefinition/>
-                                <RowDefinition/>
+                                <RowDefinition Height="auto"/>
+                                <RowDefinition Height="auto"/>
+                                <RowDefinition Height="auto"/>
+                                <RowDefinition Height="auto"/>
+                                <RowDefinition Height="auto"/>
                                 <RowDefinition Height="auto"/>
                             </Grid.RowDefinitions>
                             <TextBlock Text="Simulatiecontrols" FontSize="18" Foreground="RoyalBlue" Grid.ColumnSpan="3" HorizontalAlignment="Center"/>
 
                             <TextBlock Text="wenswaarde" Grid.Row="1"  FontSize="15" Foreground="RoyalBlue" Grid.ColumnSpan="3" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="2" Visibility="{Binding RegelaarVisibility}"/>
                             <WrapPanel Grid.Row="2" Grid.ColumnSpan="3">
-                                <Slider Margin="5,0"  Minimum="0" Maximum="100" Width="250" Value="{Binding W}" Visibility="{Binding RegelaarVisibility}"/>
-                                <TextBlock Margin="5,0" Text="{Binding W}" FontSize="15" Foreground="RoyalBlue" Visibility="{Binding RegelaarVisibility}"/>
+                                <Slider Margin="5,0"  Minimum="0" Maximum="100" Width="250" Value="{Binding W, StringFormat=F2}" Visibility="{Binding RegelaarVisibility}"/>
+                                <TextBlock Margin="5,0" Text="{Binding W, StringFormat=F2}" FontSize="15" Foreground="RoyalBlue" Visibility="{Binding RegelaarVisibility}"/>
                             </WrapPanel>
 
 
                             <TextBlock Text="simulatiesnelheid" Grid.Row="3" FontSize="15" Foreground="RoyalBlue" Grid.ColumnSpan="3" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="2" Visibility="{Binding SimulatieSnelheidVisibility}"/>
-                            <WrapPanel Grid.Row="4" Grid.ColumnSpan="3">
-                                <Slider Margin="5,0" Minimum="0.5" Maximum="5" Width="250" IsEnabled="{Binding IsRunning}" Value="{Binding SimulatieSnelheid}" Visibility="{Binding SimulatieSnelheidVisibility}"/>
-                                <TextBlock Margin="5,0" Text="{Binding SimulatieSnelheid}" FontSize="15" Foreground="RoyalBlue" Visibility="{Binding SimulatieSnelheidVisibility}"/>
+                            <WrapPanel Grid.Row="4" Grid.ColumnSpan="3" Visibility="{Binding SimulatieSnelheidVisibility}">
+                                <Slider Margin="5,0" Minimum="0.5" Maximum="5" Width="250" IsEnabled="{Binding IsRunning}" Value="{Binding SimulatieSnelheid}"/>
+                                <TextBlock Margin="5,0" Text="{Binding SimulatieSnelheid, StringFormat=F2}" FontSize="15" Foreground="RoyalBlue"/>
                             </WrapPanel>
 
                             <Button  Command="{Binding StartCommand}" Foreground="RoyalBlue" Margin="25,10" Height="20" Width="50" Background="White" BorderBrush="RoyalBlue" Grid.Row="5" Content="start"/>
@@ -166,62 +166,69 @@
                 <Grid HorizontalAlignment="Stretch">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="auto"/>
-                        <RowDefinition Height="auto"/>
-                        <RowDefinition Height="auto"/>
                         <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition/>
-                        <ColumnDefinition/>
+                    <!--#region procesgrid-->
 
-                    </Grid.ColumnDefinitions>
+                    <Grid Visibility="{Binding ProcesVisibility}">
+                        <Grid.RowDefinitions>
+                            <RowDefinition/>
+                            <RowDefinition/>
+                            <RowDefinition/>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition/>
+                            <ColumnDefinition/>
+                        </Grid.ColumnDefinitions>
+                        
+                        <WrapPanel Grid.ColumnSpan="3">
+                            <TextBlock Text="proceskracht" FontSize="15" Foreground="Green" Margin="2,0,2,0"/>
+                            <Slider Minimum="0" Maximum="{Binding ProcesKrachtMaxValue}" Width="150" Value="{Binding Kracht, Mode=TwoWay}"/>
+                            <TextBlock Text="{Binding Kracht, StringFormat=F3}" FontSize="15" Foreground="Green" Margin="2,0,2,0" />
+                        </WrapPanel>
 
-                    <WrapPanel Grid.ColumnSpan="3">
-                    <TextBlock Text="proceskracht" FontSize="15" Foreground="Green" Margin="2,0,2,0"/>
-                        <Slider Minimum="0" Maximum="{Binding ProcesKrachtMaxValue}" Width="150" Value="{Binding Kracht, Mode=TwoWay}"/>
-                    <TextBlock Text="{Binding Kracht, StringFormat=F3}" FontSize="15" Foreground="Green" Margin="2,0,2,0" />
-                    </WrapPanel>
-                    
-                    <WrapPanel Grid.Column="4" Grid.ColumnSpan="3">
-                    <TextBlock Text="tijdsconstante" FontSize="15" Foreground="Green" Grid.Column="4" Margin="0,0,5,0"/>
-                        <Slider Minimum="0" Maximum="{Binding TijdsconstanteMaxValue}" Width="150" IsEnabled="{Binding IsRunning}" Value="{Binding TijdsConstante, Mode=TwoWay}"/>
-                    <TextBlock Text="{Binding TijdsConstante, StringFormat=F3}" FontSize="15" Foreground="Green" Margin="10,0,2,0"/>
-                    </WrapPanel>
-                    <WrapPanel Grid.Row="1" Grid.Column="1" HorizontalAlignment="Center">
-                        <RadioButton IsChecked="{Binding TijdsconstanteMultiplier, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=OneX}" GroupName="TijdConstanteRB" VerticalAlignment="Center"/>
-                        <TextBlock Text="x1" FontSize="15" Foreground="Green"/>
-                        <RadioButton IsChecked="{Binding TijdsconstanteMultiplier, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=TenX}" GroupName="TijdConstanteRB"  VerticalAlignment="Center"/>
-                        <TextBlock Text="x10" FontSize="15" Foreground="Green"/>
-                        <RadioButton IsChecked="{Binding TijdsconstanteMultiplier, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=HundredX}" GroupName="TijdConstanteRB"  VerticalAlignment="Center"/>
-                        <TextBlock Text="x100" FontSize="15" Foreground="Green"/>
-                    </WrapPanel>
-                    <WrapPanel Grid.Row="1" HorizontalAlignment="Center">
-                        <RadioButton IsChecked="{Binding ProcesKrachtMultiplier, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=OneX}" GroupName="ProcesKracht" VerticalAlignment="Center"/>
-                        <TextBlock Text="x1" FontSize="15" Foreground="Green" Margin="0,0,0,5"/>
-                        <RadioButton IsChecked="{Binding ProcesKrachtMultiplier, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=TenX}" GroupName="ProcesKracht"  VerticalAlignment="Center"/>
-                        <TextBlock Text="x10" FontSize="15" Foreground="Green"/>
-                        <RadioButton IsChecked="{Binding ProcesKrachtMultiplier, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=HundredX}" GroupName="ProcesKracht"  VerticalAlignment="Center"/>
-                        <TextBlock Text="x100" FontSize="15" Foreground="Green"/>
-                    </WrapPanel>
-                    <WrapPanel Grid.Row="2">
-                    <TextBlock Text="proces orde" FontSize="15" Foreground="Green" Margin="2"/>
-                        <ComboBox  Height="20" Width="100" HorizontalAlignment="Left" VerticalAlignment="Top" IsEnabled="{Binding IsRunning}" SelectedValue="{Binding Orde, Mode=TwoWay}">
-                            <ComboBoxItem Content="0orde"/>
-                            <ComboBoxItem Content="1orde"/>
-                            <ComboBoxItem Content="2orde"/>
-                        </ComboBox>
-                    </WrapPanel>
-                    <WrapPanel Grid.Row="2" Grid.Column="1">
-                    <TextBlock Text="dodetijd" HorizontalAlignment="Right" FontSize="15" Foreground="Green" Margin="2"/>
-                    <ComboBox Height="20" Width="150" HorizontalAlignment="Left" VerticalAlignment="Top" IsEnabled="{Binding IsRunning}" SelectedValue="{Binding DodeTijd, Mode=TwoWay}">
-                        <ComboBoxItem Content="geen dodetijd"/>
-                        <ComboBoxItem Content="klein beetje dodetijd"/>
-                        <ComboBoxItem Content="wat dodetijd"/>
-                        <ComboBoxItem Content="gemiddeld dodetijd"/>
-                        <ComboBoxItem Content="meer dan gemiddeld dodetijd"/>
-                        <ComboBoxItem Content="veel dodetijd"/>
-                    </ComboBox>
-</WrapPanel>
+                        <WrapPanel Grid.Column="4" Grid.ColumnSpan="3">
+                            <TextBlock Text="tijdsconstante" FontSize="15" Foreground="Green" Grid.Column="4" Margin="0,0,5,0"/>
+                            <Slider Minimum="0" Maximum="{Binding TijdsconstanteMaxValue}" Width="150" IsEnabled="{Binding IsRunning}" Value="{Binding TijdsConstante, Mode=TwoWay}"/>
+                            <TextBlock Text="{Binding TijdsConstante, StringFormat=F3}" FontSize="15" Foreground="Green" Margin="10,0,2,0"/>
+                        </WrapPanel>
+                        <WrapPanel Grid.Row="1" Grid.Column="1" HorizontalAlignment="Center">
+                            <RadioButton IsChecked="{Binding TijdsconstanteMultiplier, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=OneX}" GroupName="TijdConstanteRB" VerticalAlignment="Center"/>
+                            <TextBlock Text="x1" FontSize="15" Foreground="Green"/>
+                            <RadioButton IsChecked="{Binding TijdsconstanteMultiplier, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=TenX}" GroupName="TijdConstanteRB"  VerticalAlignment="Center"/>
+                            <TextBlock Text="x10" FontSize="15" Foreground="Green"/>
+                            <RadioButton IsChecked="{Binding TijdsconstanteMultiplier, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=HundredX}" GroupName="TijdConstanteRB"  VerticalAlignment="Center"/>
+                            <TextBlock Text="x100" FontSize="15" Foreground="Green"/>
+                        </WrapPanel>
+                        <WrapPanel Grid.Row="1" HorizontalAlignment="Center">
+                            <RadioButton IsChecked="{Binding ProcesKrachtMultiplier, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=OneX}" GroupName="ProcesKracht" VerticalAlignment="Center"/>
+                            <TextBlock Text="x1" FontSize="15" Foreground="Green" Margin="0,0,0,5"/>
+                            <RadioButton IsChecked="{Binding ProcesKrachtMultiplier, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=TenX}" GroupName="ProcesKracht"  VerticalAlignment="Center"/>
+                            <TextBlock Text="x10" FontSize="15" Foreground="Green"/>
+                            <RadioButton IsChecked="{Binding ProcesKrachtMultiplier, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=HundredX}" GroupName="ProcesKracht"  VerticalAlignment="Center"/>
+                            <TextBlock Text="x100" FontSize="15" Foreground="Green"/>
+                        </WrapPanel>
+                        <WrapPanel Grid.Row="2">
+                            <TextBlock Text="proces orde" FontSize="15" Foreground="Green" Margin="2"/>
+                            <ComboBox  Height="20" Width="100" HorizontalAlignment="Left" VerticalAlignment="Top" IsEnabled="{Binding IsRunning}" SelectedValue="{Binding Orde, Mode=TwoWay}">
+                                <ComboBoxItem Content="0orde"/>
+                                <ComboBoxItem Content="1orde"/>
+                                <ComboBoxItem Content="2orde"/>
+                            </ComboBox>
+                        </WrapPanel>
+                        <WrapPanel Grid.Row="2" Grid.Column="1">
+                            <TextBlock Text="dodetijd" HorizontalAlignment="Right" FontSize="15" Foreground="Green" Margin="2"/>
+                            <ComboBox Height="20" Width="150" HorizontalAlignment="Left" VerticalAlignment="Top" IsEnabled="{Binding IsRunning}" SelectedValue="{Binding DodeTijd, Mode=TwoWay}">
+                                <ComboBoxItem Content="geen dodetijd"/>
+                                <ComboBoxItem Content="klein beetje dodetijd"/>
+                                <ComboBoxItem Content="wat dodetijd"/>
+                                <ComboBoxItem Content="gemiddeld dodetijd"/>
+                                <ComboBoxItem Content="meer dan gemiddeld dodetijd"/>
+                                <ComboBoxItem Content="veel dodetijd"/>
+                            </ComboBox>
+                        </WrapPanel>
+                    </Grid>
+                    <!--#endregion-->
                     <!--#region graph grid-->
                     <Grid Grid.Row="3" Grid.ColumnSpan="7" Margin="5" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
                         <Border BorderBrush="RoyalBlue" BorderThickness="2" Margin="2">
@@ -234,7 +241,7 @@
         </Grid>
         <!--#endregion-->
         <!--#region animationgrid-->
-        <Grid Grid.Row="1" Grid.Column="1" HorizontalAlignment="Center" Margin="2">
+        <Grid Grid.Row="1" Grid.Column="1" HorizontalAlignment="Center" Margin="2" Visibility="{Binding AnimatieVisibility}">
             <Border BorderBrush="Green" BorderThickness="2" >
                 <Grid Name="AnimationGrid" Grid.Column="2" Margin="10" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
 
