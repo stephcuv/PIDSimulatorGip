@@ -22,7 +22,6 @@ namespace PIDSimulatorGip.view
     {
         public NewMainWindow()
         {
-            InitializeComponent();
             MainSimulationViewModel vm = new MainSimulationViewModel();
             DataContext = vm;
         }

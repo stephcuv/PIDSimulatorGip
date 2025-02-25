@@ -27,7 +27,7 @@ namespace PIDSimulatorGip.viewmodel
         private double _procesWaarde = 0; //waarde van proces op dit moment
 
         private double _currentXaxis = 0;
-
+        private double _maxXAxisPoints = 100;
         private double _simulatieSnelheid = 0.5;
 
 
@@ -91,6 +91,8 @@ namespace PIDSimulatorGip.viewmodel
         public bool IsRunning { get { return !_isRunning; } set { _isRunning = value; OnPropertyChanged(); } }
         public bool SerialComActive { set { _serialComSimStatus = value; OnPropertyChanged(); } get { return _serialComSimStatus; } }
         public bool Stapsprong { set { _stapsprongSimStatus = value; OnPropertyChanged(); } get { return _stapsprongSimStatus; } }
+        public string MaxXAxisPoints { set { _maxXAxisPoints = Convert.ToDouble(value); OnPropertyChanged(); } get { return Convert.ToString(_maxXAxisPoints); } }
+
         #endregion
         #region pid regelaar 
         public double VSFP { get { return _RGLR.VSFP; } set { _RGLR.VSFP = Math.Round(value, 3); OnPropertyChanged(); } }
@@ -105,7 +107,7 @@ namespace PIDSimulatorGip.viewmodel
         public double Kracht { set { _proces.Kracht = Math.Round(value, 2); OnPropertyChanged(); } get { return _proces.Kracht; } }
         public string DodeTijd { set { _proces.DodeTijd = value; OnPropertyChanged(); } get { return _proces.DodeTijd; } }
         public string Orde { set { _proces.Orde = value; OnPropertyChanged(); } get { return _proces.Orde; } }
-        public double ProcesWaarde { private set { _procesWaarde = value; OnPropertyChanged(); } get { return _procesWaarde * 3; } }
+        public double ProcesWaarde { private set { _procesWaarde = value; OnPropertyChanged(); } get { return _procesWaarde*2; } }
         #endregion
         #region serial communication     
         private bool _serialSubscribed = false;
@@ -214,6 +216,7 @@ namespace PIDSimulatorGip.viewmodel
                 if ((TijdsConstante > 0) && (Kracht > 0) && !string.IsNullOrEmpty(DodeTijd) && !string.IsNullOrEmpty(Orde) && !string.IsNullOrEmpty(Type) && (VSFP != 0 || VSFI != 0 || VSFD != 0))
                 {
                     IsRunning = true;
+                    _myPlot.ResetAllAxes();
                     _standardSimStatus = true;
                     _timer.Interval = TimeSpan.FromMilliseconds(_simulatieSnelheid * 20);
                     _timer.Start();
@@ -229,6 +232,7 @@ namespace PIDSimulatorGip.viewmodel
                 {
                     IsRunning = true;
                     _timer.Interval = TimeSpan.FromMilliseconds(_simulatieSnelheid * 20);
+                    _myPlot.ResetAllAxes();
                     _timer.Start();
                 }
                 else
@@ -241,6 +245,7 @@ namespace PIDSimulatorGip.viewmodel
                 if (!string.IsNullOrEmpty(Type) && _serial.Connected && (VSFP != 0 || VSFI != 0 || VSFD != 0))
                 {
                     IsRunning = true;
+                    _myPlot.ResetAllAxes();
                     _serial.SendSerialData($"{_RGLR.Berekening()}");
                 }
                 else
@@ -306,7 +311,7 @@ namespace PIDSimulatorGip.viewmodel
             }
             TijdsConstante = 0;
             ProcesWaarde = 0;
-
+            MaxXAxisPoints = "100";
             if (_stapsprongSimStatus) StapsprongGridVisibility();
             if (_serialComSimStatus) SerialCommGridVisibility();
         }
@@ -377,21 +382,6 @@ namespace PIDSimulatorGip.viewmodel
                 rglrWaardes.Points.Add(new DataPoint(_currentXaxis, _rglrWaarde));
                 procesWaardes.Points.Add(new DataPoint(_currentXaxis, _procesWaarde));
                 wensWaardes.Points.Add(new DataPoint(_currentXaxis, W));
-
-                /*
-                if (_standardSimStatus)
-                {
-                    if (rglrWaardes.Points.Count > 100) rglrWaardes.Points.RemoveAt(0);
-                    if (procesWaardes.Points.Count > 100) procesWaardes.Points.RemoveAt(0);
-                    if (wensWaardes.Points.Count > 100) wensWaardes.Points.RemoveAt(0);
-                }
-                else
-                {
-                    if (rglrWaardes.Points.Count > 100) rglrWaardes.Points.RemoveAt(0);
-                    if (procesWaardes.Points.Count > 100) procesWaardes.Points.RemoveAt(0);
-                    if (wensWaardes.Points.Count > 100) wensWaardes.Points.RemoveAt(0);
-                }
-                */
             }
 
 
@@ -404,12 +394,6 @@ namespace PIDSimulatorGip.viewmodel
 
                 procesWaardes.Points.Add(new DataPoint(_currentXaxis, _procesWaarde));
                 wensWaardes.Points.Add(new DataPoint(_currentXaxis, _stapsprongWaarde));
-
-
-                /*
-                if (procesWaardes.Points.Count > 100) procesWaardes.Points.RemoveAt(0);
-                if (wensWaardes.Points.Count > 100) wensWaardes.Points.RemoveAt(0);
-                */
             }
 
             else
@@ -419,8 +403,8 @@ namespace PIDSimulatorGip.viewmodel
             var xAxis = MyPlot.Axes.FirstOrDefault(a => a.Position == AxisPosition.Bottom);
             if (xAxis != null)
             {
-                if (!_serialComSimStatus) xAxis.Minimum = _currentXaxis - (100 * TijdsConstante); // Keeps last 100 points visible
-                else xAxis.Minimum = _currentXaxis - 2000;
+                if (!_serialComSimStatus) xAxis.Minimum = _currentXaxis - (_maxXAxisPoints * TijdsConstante); // Keeps last 100 points visible
+                else xAxis.Minimum = _currentXaxis - _maxXAxisPoints;
                 xAxis.Maximum = _currentXaxis;
             }
 
