@@ -4,13 +4,15 @@ using OxyPlot.Legends;
 using OxyPlot.Series;
 using PIDSimulatorGip.model;
 using PIDSimulatorGip.MVVM;
+using System.ComponentModel;
 using System.Diagnostics;
-using System.Diagnostics.Eventing.Reader;
+using System.IO.Ports;
 using System.Windows;
 using System.Windows.Threading;
 
 namespace PIDSimulatorGip.viewmodel
 {
+
     internal class MainSimulationViewModel : ViewModelBase
     {
 
@@ -18,16 +20,15 @@ namespace PIDSimulatorGip.viewmodel
         private ProcesBerekening _proces;
         private DispatcherTimer _timer;
         private PlotModel? _myPlot;
+        private SerialCommunication _serial;
 
 
         private double _rglrWaarde = 0; //waarde van de regelaar op dit moment
         private double _procesWaarde = 0; //waarde van proces op dit moment
 
         private double _currentXaxis = 0;
-
-        private double _simulatieSnelheid;
-
-        private double _stapsprongWaarde = 0;
+        private double _maxXAxisPoints = 100;
+        private double _simulatieSnelheid = 0.5;
 
 
         public MainSimulationViewModel()
@@ -46,130 +47,167 @@ namespace PIDSimulatorGip.viewmodel
 
             _timer.Tick += Timer_Tick;
         }
+
         public RelayCommand StartCommand => new RelayCommand(execute => { StartSimulation(); }, canExecute => { return !_isRunning; });
         public RelayCommand ResetCommand => new RelayCommand(execute => { ResetSimulation(); }, canExecute => { return _isRunning; });
         public RelayCommand PauzeCommand => new RelayCommand(exectue => { PauseSimulation(); }, canExecute => { return _isRunning; });
 
-        public RelayCommand StapSprongCommand => new RelayCommand(execute => { StapsprongGridVisibility(); }, canExecute => { return !_isRunning && !_serialComSimStatus; });
-        public RelayCommand SerialCommCommand => new RelayCommand(execute => { SerialCommGridVisibility(); }, canExecute => { return !_isRunning && !_stapsprongSimStatus; });
+        public RelayCommand AdjustValueCommand => new RelayCommand(execute => { AdjustValue(execute); });
 
-
+        public RelayCommand StapsprongCommand => new RelayCommand(execute => { StapsprongGridVisibility(); }, canExecute => { return !_isRunning && !_serialComSimStatus; });
+        public RelayCommand SerialCommCommand => new RelayCommand(execute => { SerialCommGridVisibility(); Serial(); }, canExecute => { return !_isRunning && !_stapsprongSimStatus; });
+        public RelayCommand StartStapsprongCommand => new RelayCommand(execute => { StartStapsprongFunction(); }, canExecute => { return _isRunning; });
         public PlotModel MyPlot { get { return _myPlot; } set { _myPlot = value; OnPropertyChanged(); } }
-        public double SimulatieSnelheid { set { _simulatieSnelheid = Math.Round(value, 2); OnPropertyChanged(); } get { return _simulatieSnelheid; } }
 
+        #region stapsprong
+        private double _stapsprongWaarde = 0;
+        private double _stapsprongChangeWaarde = 0;
         public double StapsprongWaarde { set { _stapsprongWaarde = Math.Round(value, 2); OnPropertyChanged(); } get { return _stapsprongWaarde; } }
+        public double StapsprongChangeWaarde { set { _stapsprongChangeWaarde = Math.Round(value, 2); OnPropertyChanged(); } get { return _stapsprongChangeWaarde; } }
+
+
+        private void StartStapsprongFunction()
+        {
+            if ((_stapsprongWaarde + _stapsprongChangeWaarde) > 100)
+            {
+                StapsprongWaarde = 100;
+            }
+            else if ((_stapsprongWaarde + _stapsprongChangeWaarde) < 0)
+            {
+                StapsprongWaarde = 0;
+            }
+            else
+            {
+                StapsprongWaarde = _stapsprongWaarde + _stapsprongChangeWaarde;
+            }
+        }
+        #endregion
         #region simulation status
 
         private bool _isRunning;
         private bool _standardSimStatus;
         private bool _serialComSimStatus;
         private bool _stapsprongSimStatus;
+        public double SimulatieSnelheid { set { _simulatieSnelheid = Math.Round(value, 2); OnPropertyChanged(); } get { return _simulatieSnelheid; } }
         public bool IsRunning { get { return !_isRunning; } set { _isRunning = value; OnPropertyChanged(); } }
         public bool SerialComActive { set { _serialComSimStatus = value; OnPropertyChanged(); } get { return _serialComSimStatus; } }
         public bool Stapsprong { set { _stapsprongSimStatus = value; OnPropertyChanged(); } get { return _stapsprongSimStatus; } }
+        public string MaxXAxisPoints { set { _maxXAxisPoints = Convert.ToDouble(value); OnPropertyChanged(); } get { return Convert.ToString(_maxXAxisPoints); } }
+
         #endregion
         #region pid regelaar 
-        public double VSFP { get { return _RGLR.VSFP; } set { _RGLR.VSFP = Math.Round(value, 3); OnPropertyChanged(); } }
-        public double VSFI { get { return _RGLR.VSFI; } set { _RGLR.VSFI = Math.Round(value, 3); OnPropertyChanged(); } }
-        public double VSFD { get { return _RGLR.VSFD; } set { _RGLR.VSFD = Math.Round(value, 3); OnPropertyChanged(); } }
-        public double W { get { return _RGLR.W; } set { _RGLR.W = Math.Round(value, 2); OnPropertyChanged(); } }
-        public double TijdsConstante { set { _RGLR.Tijdsconstante = Math.Round(value, 2); _proces.Tijdsconstante = Math.Round(value, 2); OnPropertyChanged(); } get { return _RGLR.Tijdsconstante; } }
+        public double VSFP { get { return _RGLR.VSFP; } set {if((_RGLR.VSFP + value) >=0) _RGLR.VSFP = Math.Round(value, 3); OnPropertyChanged(); } }
+        public double VSFI { get { return _RGLR.VSFI; } set {if ((_RGLR.VSFI + value) >= 0) _RGLR.VSFI = Math.Round(value, 3); OnPropertyChanged(); } }
+        public double VSFD { get { return _RGLR.VSFD; } set {if ((_RGLR.VSFD + value) >= 0) _RGLR.VSFD = Math.Round(value, 3); OnPropertyChanged(); } }
+        public double W { get { return _RGLR.W; } set {if (value >= 0) _RGLR.W = Math.Round(value, 2); OnPropertyChanged(); } }
+        public double TijdsConstante { set { if ((_RGLR.Tijdsconstante + value) >= 0) { _RGLR.Tijdsconstante = Math.Round(value, 3); _proces.Tijdsconstante = Math.Round(value, 3); } OnPropertyChanged(); } get { return _RGLR.Tijdsconstante; } }
         public string Type { set { _RGLR.Type = value; OnPropertyChanged(); } get { return _RGLR.Type; } }
 
+        private void AdjustValue(object parameter)
+        {
+            string value = Convert.ToString(parameter);
+            
+            switch(value)
+            {
+                case "PUp":
+                    VSFP = VSFP + 0.005;
+                    break;
+
+                case "PDown":
+                    VSFP = VSFP - 0.005;
+                    break;
+
+                case "IUp":
+                    VSFI = VSFI + 0.005;
+                    break;
+
+                case "IDown":
+                    VSFI = VSFI - 0.005;
+                    break;
+
+                case "DUp":
+                    VSFD = VSFD + 0.005;
+                    break;
+
+                case "DDown":
+                    VSFD = VSFD - 0.005;
+                    break;
+
+                case "PKUp":
+                    Kracht = Kracht + 0.05;
+                    break;
+
+                case "PKDown":
+                    Kracht = Kracht - 0.05;
+                    break;
+
+                case "DtUp":
+                    TijdsConstante = TijdsConstante + 0.005;
+                    break;
+
+                case "DtDown":
+                    TijdsConstante = TijdsConstante - 0.005;
+                    break;
+            }
+        }
         #endregion
         #region pid proces
-        public double Kracht { set { _proces.Kracht = Math.Round(value, 2); OnPropertyChanged(); } get { return _proces.Kracht; } }
+        public double Kracht { set { if ((_proces.Kracht + value) >= 0) { _proces.Kracht = Math.Round(value, 2); } OnPropertyChanged(); } get { return _proces.Kracht; } }
         public string DodeTijd { set { _proces.DodeTijd = value; OnPropertyChanged(); } get { return _proces.DodeTijd; } }
         public string Orde { set { _proces.Orde = value; OnPropertyChanged(); } get { return _proces.Orde; } }
+        public double ProcesWaarde { private set { _procesWaarde = value; OnPropertyChanged(); } get { return _procesWaarde*2; } }
+        #endregion
+        #region serial communication     
+        private bool _serialSubscribed = false;
+        private EventHandler<string> _dataReceivedHandler;
+        private void Serial()
+        {
+            Stopwatch stopwatch = new Stopwatch();
 
-        public double ProcesWaarde { private set { _procesWaarde = value; OnPropertyChanged(); } get { return _procesWaarde * 3; } }
+            if (_serial == null)
+            {
+                _serial = new SerialCommunication();
+            }
+            _serial.ConnectSerPort();
+            if (!_serialSubscribed)
+            {
+                _dataReceivedHandler += (sender, data) =>
+                {
+                    if (_isRunning)
+                    {
+                        stopwatch.Stop();
+                        TijdsConstante = stopwatch.ElapsedMilliseconds;
+                        _procesWaarde = Convert.ToDouble(_serial.IncomeData);
+                        _RGLR.X = _procesWaarde;
+                        _rglrWaarde = _RGLR.Berekening();
+                        Application.Current.Dispatcher.Invoke(() =>
+                        {
+                            GraphAdd();
+                        });
+                        _serial.SendSerialData($"{_rglrWaarde}");
+                        stopwatch.Restart();
+                    }
+                };
+                _serial.DataReceived += _dataReceivedHandler;
+                _serialSubscribed = true;
+            }
+
+        }
         #endregion
         #region ui grid visibility 
         private Visibility _regelaarVisibility = Visibility.Visible;
         private Visibility _procesVisiblity = Visibility.Visible;
         private Visibility _serialVisibility = Visibility.Collapsed;
         private Visibility _stapsprongVisibility = Visibility.Collapsed;
+        private Visibility _simulatieSnelheidVisibility = Visibility.Visible;
+        private Visibility _animatieVisibility = Visibility.Visible;
         public Visibility RegelaarVisibility { set { _regelaarVisibility = value; OnPropertyChanged(); } get { return _regelaarVisibility; } }
         public Visibility ProcesVisibility { set { _procesVisiblity = value; OnPropertyChanged(); } get { return _procesVisiblity; } }
         public Visibility SerialVisibility { set { _serialVisibility = value; OnPropertyChanged(); } get { return _serialVisibility; } }
         public Visibility StapsprongVisibility { set { _stapsprongVisibility = value; OnPropertyChanged(); } get { return _stapsprongVisibility; } }
+        public Visibility SimulatieSnelheidVisibility { set { _simulatieSnelheidVisibility = value; OnPropertyChanged(); } get { return _simulatieSnelheidVisibility; } }
+        public Visibility AnimatieVisibility { set { _animatieVisibility = value; OnPropertyChanged(); } get { return _animatieVisibility; } }
 
-        #endregion
-        private void StartSimulation()
-        {
-            if (!_stapsprongSimStatus && !_serialComSimStatus)
-            {
-                if ((TijdsConstante > 0) && (Kracht > 0) && !string.IsNullOrEmpty(DodeTijd) && !string.IsNullOrEmpty(Orde) && !string.IsNullOrEmpty(Type))
-                {
-                    IsRunning = true;
-                    _standardSimStatus = true;
-                    _timer.Interval = TimeSpan.FromMilliseconds(_simulatieSnelheid * 20);
-                    _timer.Start();
-                }
-                else
-                {
-                    IsRunning = false;
-                    _standardSimStatus = false;
-                }
-            }
-            else if (_stapsprongSimStatus)
-            {
-                if ((Kracht > 0) && !string.IsNullOrEmpty(DodeTijd) && !string.IsNullOrEmpty(Orde))
-                {
-                    IsRunning = true;
-                    _timer.Interval = TimeSpan.FromMilliseconds(_simulatieSnelheid * 20);
-                    _timer.Start();
-                }
-                else
-                {
-                    IsRunning = false;
-                }
-            }
-
-        }
-        private void PauseSimulation()
-        {
-            IsRunning = false;
-            _timer.Stop();
-        }
-
-        private void ResetSimulation()
-        {
-            IsRunning = false;
-            _timer.Stop();
-
-            var rglrWaardes = MyPlot.Series[0] as LineSeries;
-            var procesWaardes = MyPlot.Series[1] as LineSeries;
-            var wensWaardes = MyPlot.Series[2] as LineSeries;
-
-            rglrWaardes.Points.Clear();
-            procesWaardes.Points.Clear();
-            wensWaardes.Points.Clear();
-            _currentXaxis = 0;
-
-            MyPlot.InvalidatePlot(true);
-
-            for (int i = 0; i < _proces.DodeTijdNumber; i++)
-            {
-                _rglrWaarde = _RGLR.Berekening();
-                ProcesWaarde = _proces.Proces(_rglrWaarde);
-                _RGLR.X = _procesWaarde;
-            }
-
-            VSFP = 0;
-            VSFI = 0;
-            VSFD = 0;
-            W = 0;
-            TijdsConstante = 0;
-            Type = string.Empty;
-
-            Kracht = 0;
-            DodeTijd = string.Empty;
-            Orde = string.Empty;
-
-            ProcesWaarde = 0;
-            SimulatieSnelheid = 0.5;
-        }
         private void StapsprongGridVisibility()
         {
             _stapsprongSimStatus = !_stapsprongSimStatus;
@@ -182,17 +220,125 @@ namespace PIDSimulatorGip.viewmodel
             _serialComSimStatus = !_serialComSimStatus;
             SerialVisibility = (SerialVisibility == Visibility.Visible) ? Visibility.Collapsed : Visibility.Visible;
             ProcesVisibility = (ProcesVisibility == Visibility.Visible) ? Visibility.Collapsed : Visibility.Visible;
+            SimulatieSnelheidVisibility = (SimulatieSnelheidVisibility == Visibility.Visible) ? Visibility.Collapsed : Visibility.Visible;
+            AnimatieVisibility = (AnimatieVisibility == Visibility.Visible) ? Visibility.Collapsed : Visibility.Visible;
+
         }
+        #endregion
+        #region simulation control functions 
+        private void StartSimulation()
+        {
+            if (!_stapsprongSimStatus && !_serialComSimStatus)
+            {
+                if ((TijdsConstante > 0) && (Kracht > 0) && !string.IsNullOrEmpty(DodeTijd) && !string.IsNullOrEmpty(Orde) && !string.IsNullOrEmpty(Type) && (VSFP != 0 || VSFI != 0 || VSFD != 0))
+                {
+                    IsRunning = true;
+                    _myPlot.ResetAllAxes();
+                    _standardSimStatus = true;
+                    _timer.Interval = TimeSpan.FromMilliseconds(_simulatieSnelheid * 20);
+                    _timer.Start();
+                }
+                else
+                {
+                    IsRunning = false;
+                }
+            }
+            else if (_stapsprongSimStatus)
+            {
+                if ((Kracht > 0) && !string.IsNullOrEmpty(DodeTijd) && !string.IsNullOrEmpty(Orde))
+                {
+                    IsRunning = true;
+                    _timer.Interval = TimeSpan.FromMilliseconds(_simulatieSnelheid * 20);
+                    _myPlot.ResetAllAxes();
+                    _timer.Start();
+                }
+                else
+                {
+                    IsRunning = false;
+                }
+            }
+            else if (_serialComSimStatus)
+            {
+                if (!string.IsNullOrEmpty(Type) && _serial.Connected && (VSFP != 0 || VSFI != 0 || VSFD != 0))
+                {
+                    IsRunning = true;
+                    _myPlot.ResetAllAxes();
+                    _serial.SendSerialData($"{_RGLR.Berekening()}");
+                }
+                else
+                {
+                    IsRunning = false;
+                }
+            }
+
+        }
+        private void PauseSimulation()
+        {
+            IsRunning = false;
+            if (!_serialComSimStatus) _timer.Stop();
+        }
+
+        private void ResetSimulation()
+        {
+            IsRunning = false;
+            if (!_serialComSimStatus) _timer.Stop();
+            if (_serialComSimStatus)
+            {
+                _serial.DisconnectSerPort();
+                _serialSubscribed = false;
+                _serial.DataReceived -= _dataReceivedHandler;
+
+            }
+
+            MyPlot.Series.Clear();
+            MyPlot.Legends.Clear();
+            MyPlot.ResetAllAxes();
+            _currentXaxis = 0;
+            MyPlot.InvalidatePlot(true);
+
+            if (!_serialComSimStatus)
+            {
+                for (int i = 0; i < _proces.DodeTijdNumber; i++)
+                {
+                    _rglrWaarde = _RGLR.Berekening();
+                    ProcesWaarde = _proces.Proces(_rglrWaarde);
+                    _RGLR.X = _procesWaarde;
+                }
+            }
+            if (_stapsprongSimStatus)
+            {
+                StapsprongChangeWaarde = 0;
+                StapsprongWaarde = 0;
+            }
+            if (!_stapsprongSimStatus)
+            {
+                VSFP = 0;
+                VSFI = 0;
+                VSFD = 0;
+                W = 0;
+                Type = string.Empty;
+            }
+            if (!_serialComSimStatus)
+            {
+                SimulatieSnelheid = 0.5;
+
+                Kracht = 0;
+                DodeTijd = string.Empty;
+                Orde = string.Empty;
+            }
+            TijdsConstante = 0;
+            ProcesWaarde = 0;
+            MaxXAxisPoints = "100";
+            if (_stapsprongSimStatus) StapsprongGridVisibility();
+            if (_serialComSimStatus) SerialCommGridVisibility();
+        }
+
         private void Timer_Tick(object? sender, EventArgs e)
         {
             if (_stapsprongSimStatus)
             {
                 ProcesWaarde = _proces.Proces(_stapsprongWaarde);
                 GraphAdd();
-            }
-            else if (_serialComSimStatus)
-            {
-
             }
             else
             {
@@ -202,7 +348,8 @@ namespace PIDSimulatorGip.viewmodel
                 GraphAdd();
             }
         }
-
+        #endregion
+        #region graph
         private void GraphAdd()
         {
             if (MyPlot.Series.Count == 0)
@@ -218,14 +365,23 @@ namespace PIDSimulatorGip.viewmodel
 
                 if (_standardSimStatus || _serialComSimStatus)
                 {
-                    MyPlot.Series.Add(new LineSeries { Title = "Regelaar Waarde", TrackerFormatString = "tijdstip: {2:0} sec\n" + "regelaar Waarde: {4:0.00}" });
-                    MyPlot.Series.Add(new LineSeries { Title = "Proces Waarde", TrackerFormatString = "tijdstip: {2:0} sec\n" + "proces Waarde: {4:0.00}" });
-                    MyPlot.Series.Add(new LineSeries { Title = "Wenswaarde", TrackerFormatString = "tijdstip: {2:0} sec\n" + "wens Waarde: {4:0.00}" });
+                    if (_standardSimStatus)
+                    {
+                        MyPlot.Series.Add(new LineSeries { Title = "Regelaar Waarde", TrackerFormatString = "tijdstip: {2:0} sec\n" + "regelaar Waarde: {4:0.00}" });
+                        MyPlot.Series.Add(new LineSeries { Title = "Proces Waarde", TrackerFormatString = "tijdstip: {2:0} sec\n" + "proces Waarde: {4:0.00}" });
+                        MyPlot.Series.Add(new LineSeries { Title = "Wenswaarde", TrackerFormatString = "tijdstip: {2:0} sec\n" + "wens Waarde: {4:0.00}" });
+                    }
+                    else
+                    {
+                        MyPlot.Series.Add(new LineSeries { Title = "Regelaar Waarde", TrackerFormatString = "tijdstip: {2:0} millisec\n" + "regelaar Waarde: {4:0.00}" });
+                        MyPlot.Series.Add(new LineSeries { Title = "Proces Waarde", TrackerFormatString = "tijdstip: {2:0} millisec\n" + "proces Waarde: {4:0.00}" });
+                        MyPlot.Series.Add(new LineSeries { Title = "Wenswaarde", TrackerFormatString = "tijdstip: {2:0} millisec\n" + "wens Waarde: {4:0.00}" });
+                    }
                 }
                 else if (_stapsprongSimStatus)
                 {
-                    MyPlot.Series.Add(new LineSeries { Title = "Proces Waarde", TrackerFormatString = "tijdstip: {2:0} sec\n" + "Proces Waarde: {4:0.00}" });
-                    MyPlot.Series.Add(new LineSeries { Title = "stapsprong", TrackerFormatString = "tijdstip: {2:0} sec\n" + "stapsprong Waarde: {4:0.00}" });
+                    MyPlot.Series.Add(new LineSeries { Title = "Proces Waarde", TrackerFormatString = "tijdstip: {2:0#00} sec\n" + "Proces Waarde: {4:0.00}" });
+                    MyPlot.Series.Add(new LineSeries { Title = "stapsprong", TrackerFormatString = "tijdstip: {2:0#00} sec\n" + "stapsprong Waarde: {4:0.00}" });
                 }
                 else
                 {
@@ -243,12 +399,8 @@ namespace PIDSimulatorGip.viewmodel
                 rglrWaardes.Points.Add(new DataPoint(_currentXaxis, _rglrWaarde));
                 procesWaardes.Points.Add(new DataPoint(_currentXaxis, _procesWaarde));
                 wensWaardes.Points.Add(new DataPoint(_currentXaxis, W));
-
-
-                if (rglrWaardes.Points.Count > 100) rglrWaardes.Points.RemoveAt(0);
-                if (procesWaardes.Points.Count > 100) procesWaardes.Points.RemoveAt(0);
-                if (wensWaardes.Points.Count > 100) wensWaardes.Points.RemoveAt(0);
             }
+
 
             else if (_stapsprongSimStatus)
             {
@@ -259,10 +411,6 @@ namespace PIDSimulatorGip.viewmodel
 
                 procesWaardes.Points.Add(new DataPoint(_currentXaxis, _procesWaarde));
                 wensWaardes.Points.Add(new DataPoint(_currentXaxis, _stapsprongWaarde));
-
-
-                if (procesWaardes.Points.Count > 100) procesWaardes.Points.RemoveAt(0);
-                if (wensWaardes.Points.Count > 100) wensWaardes.Points.RemoveAt(0);
             }
 
             else
@@ -272,12 +420,14 @@ namespace PIDSimulatorGip.viewmodel
             var xAxis = MyPlot.Axes.FirstOrDefault(a => a.Position == AxisPosition.Bottom);
             if (xAxis != null)
             {
-                xAxis.Minimum = _currentXaxis - (100 * TijdsConstante); // Keeps last 100 points visible
+                if (!_serialComSimStatus) xAxis.Minimum = _currentXaxis - (_maxXAxisPoints * TijdsConstante); // Keeps last 100 points visible
+                else xAxis.Minimum = _currentXaxis - _maxXAxisPoints;
                 xAxis.Maximum = _currentXaxis;
             }
 
 
             MyPlot.InvalidatePlot(false);
         }
+        #endregion
     }
 }

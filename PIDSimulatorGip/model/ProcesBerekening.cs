@@ -139,6 +139,7 @@ namespace PIDSimulatorGip.model
         private double ProcesKrachtGelijk()
         {
             double X;
+            T = 0;
             if (_krachtBerState)
             {
                 X = ProcesKrachtStijgend();

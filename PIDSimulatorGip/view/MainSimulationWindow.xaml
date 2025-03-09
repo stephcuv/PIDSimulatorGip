@@ -138,7 +138,7 @@
         <!--#endregion-->
         
         <!--#region serial connection grid -->
-        <StackPanel Name="SerialStackPanel" Grid.Row="1" Grid.Column="1" HorizontalAlignment="Center" Visibility="{Binding SerialVisibility}">
+        <StackPanel Name="SerialStackPanel" Grid.Row="1" Grid.Column="1" HorizontalAlignment="Center" Visibility="Collapsed">
             <TextBlock Text="SerialComunication" FontSize="15" Foreground="White" Margin="0,0,0,20" HorizontalAlignment="Center"/>
             <WrapPanel HorizontalAlignment="Center">
                 <TextBlock Text="auto connect" FontSize="15" Foreground="White"/>
