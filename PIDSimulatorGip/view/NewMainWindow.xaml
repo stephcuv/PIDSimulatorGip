@@ -151,6 +151,7 @@
                 <Grid HorizontalAlignment="Stretch">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="auto"/>
+                        <RowDefinition Height="auto"/>
                         <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
                     <Grid.ColumnDefinitions>
@@ -178,7 +179,7 @@
                         </StackPanel>
                         <TextBlock Text="{Binding TijdsConstante, StringFormat=F3}" FontSize="15" Foreground="Green" Margin="10,0,2,0"/>
                     </WrapPanel>
-                    <WrapPanel Grid.Row="2">
+                    <WrapPanel Grid.Row="1">
                     <TextBlock Text="proces orde" FontSize="15" Foreground="Green" Margin="2"/>
                         <ComboBox  Height="20" Width="100" HorizontalAlignment="Left" VerticalAlignment="Top" IsEnabled="{Binding IsRunning}" SelectedValue="{Binding Orde, Mode=TwoWay}">
                             <ComboBoxItem Content="0orde"/>
@@ -186,17 +187,17 @@
                             <ComboBoxItem Content="2orde"/>
                         </ComboBox>
                     </WrapPanel>
-                    <WrapPanel Grid.Row="2" Grid.Column="1">
+                    <WrapPanel Grid.Row="1" Grid.Column="1">
                     <TextBlock Text="dodetijd" HorizontalAlignment="Right" FontSize="15" Foreground="Green" Margin="2"/>
-                    <ComboBox Height="20" Width="150" HorizontalAlignment="Left" VerticalAlignment="Top" IsEnabled="{Binding IsRunning}" SelectedValue="{Binding DodeTijd, Mode=TwoWay}">
-                        <ComboBoxItem Content="geen dodetijd"/>
-                        <ComboBoxItem Content="klein beetje dodetijd"/>
-                        <ComboBoxItem Content="wat dodetijd"/>
-                        <ComboBoxItem Content="gemiddeld dodetijd"/>
-                        <ComboBoxItem Content="meer dan gemiddeld dodetijd"/>
-                        <ComboBoxItem Content="veel dodetijd"/>
-                    </ComboBox>
-</WrapPanel>
+                        <ComboBox Height="20" Width="150" HorizontalAlignment="Left" VerticalAlignment="Top" IsEnabled="{Binding IsRunning}" SelectedValue="{Binding DodeTijd, Mode=TwoWay}">
+                            <ComboBoxItem Content="geen dodetijd"/>
+                            <ComboBoxItem Content="klein beetje dodetijd"/>
+                            <ComboBoxItem Content="wat dodetijd"/>
+                            <ComboBoxItem Content="gemiddeld dodetijd"/>
+                            <ComboBoxItem Content="meer dan gemiddeld dodetijd"/>
+                            <ComboBoxItem Content="veel dodetijd"/>
+                        </ComboBox>
+                    </WrapPanel>
                     <!--#region graph grid-->
                     <Grid Grid.Row="3" Grid.ColumnSpan="7" Margin="5" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
                         <Border BorderBrush="RoyalBlue" BorderThickness="2" Margin="2">
