@@ -52,6 +52,8 @@ namespace PIDSimulatorGip.viewmodel
         public RelayCommand ResetCommand => new RelayCommand(execute => { ResetSimulation(); }, canExecute => { return _isRunning; });
         public RelayCommand PauzeCommand => new RelayCommand(exectue => { PauseSimulation(); }, canExecute => { return _isRunning; });
 
+        public RelayCommand AdjustValueCommand => new RelayCommand(execute => { AdjustValue(execute); });
+
         public RelayCommand StapsprongCommand => new RelayCommand(execute => { StapsprongGridVisibility(); }, canExecute => { return !_isRunning && !_serialComSimStatus; });
         public RelayCommand SerialCommCommand => new RelayCommand(execute => { SerialCommGridVisibility(); Serial(); }, canExecute => { return !_isRunning && !_stapsprongSimStatus; });
         public RelayCommand StartStapsprongCommand => new RelayCommand(execute => { StartStapsprongFunction(); }, canExecute => { return _isRunning; });
@@ -80,7 +82,6 @@ namespace PIDSimulatorGip.viewmodel
             }
         }
         #endregion
-
         #region simulation status
 
         private bool _isRunning;
@@ -95,16 +96,63 @@ namespace PIDSimulatorGip.viewmodel
 
         #endregion
         #region pid regelaar 
-        public double VSFP { get { return _RGLR.VSFP; } set { _RGLR.VSFP = Math.Round(value, 3); OnPropertyChanged(); } }
-        public double VSFI { get { return _RGLR.VSFI; } set { _RGLR.VSFI = Math.Round(value, 3); OnPropertyChanged(); } }
-        public double VSFD { get { return _RGLR.VSFD; } set { _RGLR.VSFD = Math.Round(value, 3); OnPropertyChanged(); } }
-        public double W { get { return _RGLR.W; } set { _RGLR.W = Math.Round(value, 2); OnPropertyChanged(); } }
-        public double TijdsConstante { set { _RGLR.Tijdsconstante = Math.Round(value, 5); _proces.Tijdsconstante = Math.Round(value, 5); OnPropertyChanged(); } get { return _RGLR.Tijdsconstante; } }
+        public double VSFP { get { return _RGLR.VSFP; } set {if((_RGLR.VSFP + value) >=0) _RGLR.VSFP = Math.Round(value, 3); OnPropertyChanged(); } }
+        public double VSFI { get { return _RGLR.VSFI; } set {if ((_RGLR.VSFI + value) >= 0) _RGLR.VSFI = Math.Round(value, 3); OnPropertyChanged(); } }
+        public double VSFD { get { return _RGLR.VSFD; } set {if ((_RGLR.VSFD + value) >= 0) _RGLR.VSFD = Math.Round(value, 3); OnPropertyChanged(); } }
+        public double W { get { return _RGLR.W; } set {if (value >= 0) _RGLR.W = Math.Round(value, 2); OnPropertyChanged(); } }
+        public double TijdsConstante { set { if ((_RGLR.Tijdsconstante + value) >= 0) { _RGLR.Tijdsconstante = Math.Round(value, 3); _proces.Tijdsconstante = Math.Round(value, 3); } OnPropertyChanged(); } get { return _RGLR.Tijdsconstante; } }
         public string Type { set { _RGLR.Type = value; OnPropertyChanged(); } get { return _RGLR.Type; } }
 
+        private void AdjustValue(object parameter)
+        {
+            string value = Convert.ToString(parameter);
+            
+            switch(value)
+            {
+                case "PUp":
+                    VSFP = VSFP + 0.005;
+                    break;
+
+                case "PDown":
+                    VSFP = VSFP - 0.005;
+                    break;
+
+                case "IUp":
+                    VSFI = VSFI + 0.005;
+                    break;
+
+                case "IDown":
+                    VSFI = VSFI - 0.005;
+                    break;
+
+                case "DUp":
+                    VSFD = VSFD + 0.005;
+                    break;
+
+                case "DDown":
+                    VSFD = VSFD - 0.005;
+                    break;
+
+                case "PKUp":
+                    Kracht = Kracht + 0.05;
+                    break;
+
+                case "PKDown":
+                    Kracht = Kracht - 0.05;
+                    break;
+
+                case "DtUp":
+                    TijdsConstante = TijdsConstante + 0.005;
+                    break;
+
+                case "DtDown":
+                    TijdsConstante = TijdsConstante - 0.005;
+                    break;
+            }
+        }
         #endregion
         #region pid proces
-        public double Kracht { set { _proces.Kracht = Math.Round(value, 2); OnPropertyChanged(); } get { return _proces.Kracht; } }
+        public double Kracht { set { if ((_proces.Kracht + value) >= 0) { _proces.Kracht = Math.Round(value, 2); } OnPropertyChanged(); } get { return _proces.Kracht; } }
         public string DodeTijd { set { _proces.DodeTijd = value; OnPropertyChanged(); } get { return _proces.DodeTijd; } }
         public string Orde { set { _proces.Orde = value; OnPropertyChanged(); } get { return _proces.Orde; } }
         public double ProcesWaarde { private set { _procesWaarde = value; OnPropertyChanged(); } get { return _procesWaarde*2; } }
@@ -146,9 +194,6 @@ namespace PIDSimulatorGip.viewmodel
 
         }
         #endregion
-
-
-
         #region ui grid visibility 
         private Visibility _regelaarVisibility = Visibility.Visible;
         private Visibility _procesVisiblity = Visibility.Visible;
@@ -180,34 +225,6 @@ namespace PIDSimulatorGip.viewmodel
 
         }
         #endregion
-
-        #region multiplier
-        public enum multiplier
-        {
-            OneX = 1,
-            TenX = 10,
-            HundredX = 100
-        }
-        private multiplier _VSFPMultiplier = multiplier.OneX;
-        private multiplier _VSFIMultiplier = multiplier.OneX;
-        private multiplier _VSFDMultiplier = multiplier.OneX;
-        private multiplier _procesKrachtMultiplier = multiplier.OneX;
-        private multiplier _tijdsconsteMultiplier = multiplier.OneX;
-
-        public multiplier VSFPMultiplier { set { _VSFPMultiplier = value; OnPropertyChanged(); OnPropertyChanged(nameof(VSFPMAXvalue)); } get { return _VSFPMultiplier; } }
-        public multiplier VSFIMultiplier { set { _VSFIMultiplier = value; OnPropertyChanged(); OnPropertyChanged(nameof(VSFIMaxValue)); } get { return _VSFIMultiplier; } }
-        public multiplier VSFDMultiplier { set { _VSFDMultiplier = value; OnPropertyChanged(); OnPropertyChanged(nameof(VSFDMaxValue)); } get { return _VSFDMultiplier; } }
-        public multiplier ProcesKrachtMultiplier { set { _procesKrachtMultiplier = value; OnPropertyChanged(); OnPropertyChanged(nameof(ProcesKrachtMaxValue)); } get { return _procesKrachtMultiplier; } }
-        public multiplier TijdsconstanteMultiplier { set { _tijdsconsteMultiplier = value; OnPropertyChanged(); OnPropertyChanged(nameof(TijdsconstanteMaxValue)); } get { return _tijdsconsteMultiplier; } }
-
-        public double VSFPMAXvalue { get { return 0.5 * Convert.ToDouble(_VSFPMultiplier); } }
-        public double VSFIMaxValue { get { return 0.5 * Convert.ToDouble(_VSFIMultiplier); } }
-        public double VSFDMaxValue { get { return 0.5 * Convert.ToDouble(_VSFDMultiplier); } }
-        public double ProcesKrachtMaxValue { get { return 0.5 * Convert.ToDouble(_procesKrachtMultiplier); } }
-        public double TijdsconstanteMaxValue { get { return 0.5 * Convert.ToDouble(_tijdsconsteMultiplier); } }
-
-        #endregion
-
         #region simulation control functions 
         private void StartSimulation()
         {
@@ -363,8 +380,8 @@ namespace PIDSimulatorGip.viewmodel
                 }
                 else if (_stapsprongSimStatus)
                 {
-                    MyPlot.Series.Add(new LineSeries { Title = "Proces Waarde", TrackerFormatString = "tijdstip: {2:0} sec\n" + "Proces Waarde: {4:0.00}" });
-                    MyPlot.Series.Add(new LineSeries { Title = "stapsprong", TrackerFormatString = "tijdstip: {2:0} sec\n" + "stapsprong Waarde: {4:0.00}" });
+                    MyPlot.Series.Add(new LineSeries { Title = "Proces Waarde", TrackerFormatString = "tijdstip: {2:0#00} sec\n" + "Proces Waarde: {4:0.00}" });
+                    MyPlot.Series.Add(new LineSeries { Title = "stapsprong", TrackerFormatString = "tijdstip: {2:0#00} sec\n" + "stapsprong Waarde: {4:0.00}" });
                 }
                 else
                 {

@@ -229,7 +229,7 @@ namespace PIDSimulatorGip.model
             if (_vsfD != 0) _dWaarde = (_vsfD / _tijdsconstante) * (_meetWaardes[0] - (2 * _meetWaardes[1]) + _meetWaardes[2]);
 
 
-            double temp = _prevStuurWaarde + _pWaarde + _iWaarde - _dWaarde;
+            double temp = _prevStuurWaarde - _pWaarde + _iWaarde - _dWaarde;
             if (temp < 0)
             {
                 temp = 0;
