@@ -21,6 +21,11 @@ namespace PIDSimulatorGip.model
         private string _incomeData = string.Empty;
         private bool _connected = false;
 
+        private List<string> _mogelijkeSerportsList = new List<string>();
+        private bool _meerdereSerPorts = false;
+
+        
+        
         public event EventHandler<string> DataReceived;
 
         public string[] SerPort{ get { return _serPort; }set { _serPort = value; }}
@@ -38,7 +43,7 @@ namespace PIDSimulatorGip.model
             try
             {
                 ManagementObjectSearcher searcher = new ManagementObjectSearcher("root\\CIMV2", "SELECT * FROM WIN32_PnPEntity");
-                var ports = new List<string>();
+                _mogelijkeSerportsList.Clear();
 
                 foreach (ManagementObject obj in searcher.Get())
                 {
@@ -52,7 +57,7 @@ namespace PIDSimulatorGip.model
                             string comPort = ExtractCOMPortName(name);
                             if (!string.IsNullOrEmpty(comPort))
                             {
-                                ports.Add(comPort);
+                                _mogelijkeSerportsList.Add(comPort);
                                 Console.WriteLine(comPort);
                             }
                         }
@@ -62,7 +67,8 @@ namespace PIDSimulatorGip.model
                         Debug.WriteLine("fout in foreach findallports");
                     }
                 }
-                if(ports.Count > 0) _chosenPort = ports[0];
+                if (_mogelijkeSerportsList.Count == 1) _chosenPort = _mogelijkeSerportsList[0];
+                else if (_mogelijkeSerportsList.Count > 1) _meerdereSerPorts = true; 
             }
             catch
             {
@@ -85,21 +91,24 @@ namespace PIDSimulatorGip.model
             return null;
         }
 
-        public void ConnectSerPort()
+        public List<string> ConnectSerPort()
         {
             try
             {
                 FindAllPorts();
-
-                _port = new SerialPort(_chosenPort);
-                _port.BaudRate = 9600;
-                _port.DataReceived += new SerialDataReceivedEventHandler(DataReceivedHandler);
-                _port.Open();
-                Console.WriteLine("trying to connect");
-                if (_port.IsOpen)
+                if (_meerdereSerPorts && string.IsNullOrEmpty(_chosenPort)) return _mogelijkeSerportsList;
+                else
                 {
-                    Connected = true;
-                    Debug.WriteLine("connected");
+                    _port = new SerialPort(_chosenPort);
+                    _port.BaudRate = 9600;
+                    _port.DataReceived += new SerialDataReceivedEventHandler(DataReceivedHandler);
+                    _port.Open();
+                    Console.WriteLine("trying to connect");
+                    if (_port.IsOpen)
+                    {
+                        Connected = true;
+                        Debug.WriteLine("connected");
+                    } 
                 }
             }
             catch (ArgumentException)
@@ -114,6 +123,7 @@ namespace PIDSimulatorGip.model
             {
                 Debug.WriteLine("er liep iets fout tijdens verbinden");
             }
+            return null;
         }
         public void DataReceivedHandler(object sender, SerialDataReceivedEventArgs e)
         {

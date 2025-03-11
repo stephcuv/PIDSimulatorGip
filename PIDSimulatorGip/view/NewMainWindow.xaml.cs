@@ -1,4 +1,5 @@
-﻿using PIDSimulatorGip.viewmodel;
+﻿using PIDSimulatorGip.MVVM;
+using PIDSimulatorGip.viewmodel;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,6 +25,12 @@ namespace PIDSimulatorGip.view
         {
             MainSimulationViewModel vm = new MainSimulationViewModel();
             DataContext = vm;
+            (this.DataContext as MainSimulationViewModel).MessageBoxRequest += new EventHandler<MvvmMessageBoxEventArgs>(MyView_MessageBoxRequest);
+        }
+
+        void MyView_MessageBoxRequest(object sender, MvvmMessageBoxEventArgs e)
+        {
+            e.Show();
         }
     }
 }

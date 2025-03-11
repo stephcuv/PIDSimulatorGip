@@ -1,0 +1,32 @@
+﻿<Window x:Class="PIDSimulatorGip.view.CustomMessageBox"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:PIDSimulatorGip.view"
+        mc:Ignorable="d"
+        Title="CustomMessageBox" Height="auto" Width="auto"
+        WindowStyle="None"
+        WindowStartupLocation="CenterOwner" ResizeMode="NoResize" ShowInTaskbar="False">
+    
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition/>
+            <RowDefinition/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition/>
+            <ColumnDefinition/>
+            <ColumnDefinition/>
+        </Grid.ColumnDefinitions>
+
+        <TextBlock Text="error" Grid.ColumnSpan="3" HorizontalAlignment="Center"/>
+        <WrapPanel Grid.Row="1" Grid.ColumnSpan="3" Margin="5">
+            <TextBlock Text="{Binding MessageboxText}"/>
+        </WrapPanel>
+        <Button Grid.Row="2" Margin="3" Background="Transparent" Command="{Binding ButtonCommand}" CommandParameter="{Binding Btn1Text}" Content="{Binding Btn1Text}"/>
+        <Button Grid.Row="2" Grid.Column="1" Margin="3" Background="Transparent" Command="{Binding ButtonCommand}" CommandParameter="{Binding Btn2Text}" Content="{Binding Btn2Text}"/>
+        <Button Grid.Row="2" Grid.Column="2" Margin="3" Background="Transparent" Command="{Binding ButtonCommand}" CommandParameter="{Binding Btn3Text}" Content="{Binding Btn3Text}"/>
+    </Grid>
+</Window>
