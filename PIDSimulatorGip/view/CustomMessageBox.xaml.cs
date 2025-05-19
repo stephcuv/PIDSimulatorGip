@@ -22,8 +22,7 @@ namespace PIDSimulatorGip.view
     {
         public CustomMessageBox()
         {
-            CustomMessageBoxViewModel vm = new CustomMessageBoxViewModel();
-            DataContext = vm;
+
         }
     }
 }

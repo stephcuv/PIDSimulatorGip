@@ -4,35 +4,40 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Input;
+using System.Windows;
 
 namespace PIDSimulatorGip.viewmodel
 {
-    internal class CustomMessageBoxViewModel 
+    internal class CustomMessageBoxViewModel
     {
-        public RelayCommand ButtonCommand => new RelayCommand(execute => { DataProcessing(execute); });
+        public string Message { get; set; }
+        public string UserInput { get; set; }
 
-        public string MessageboxText { get; set; }
-        public string Btn1Text { get; set; }
-        public string Btn2Text { get; set; }
-        public string Btn3Text { get; set; }
+        public ICommand OkCommand { get; }
+        public ICommand CancelCommand { get; }
 
-        public string ChosenPort { get; set; }
-        private void DataProcessing(object? parameter)
+        private readonly Window _dialogWindow;
+
+        public CustomMessageBoxViewModel(Window dialogWindow, string message)
         {
-            ChosenPort = parameter?.ToString();   
+            _dialogWindow = dialogWindow;
+            Message = message;
+
+            OkCommand = new RelayCommand(ExecuteOk);
+            CancelCommand = new RelayCommand(ExecuteCancel);
         }
 
-        public void Show(string messageboxText, List<string> mogelijkeSerPort)
+        private void ExecuteOk(object parameter)
         {
+            _dialogWindow.DialogResult = true;
+            _dialogWindow.Close();
+        }
 
-            MessageboxText = messageboxText;
-            Btn1Text = mogelijkeSerPort[0];
-            Btn2Text = mogelijkeSerPort[1];
-            
-            if(mogelijkeSerPort.Count() == 3)
-            {
-                Btn3Text = mogelijkeSerPort[2];
-            }
+        private void ExecuteCancel(object parameter)
+        {
+            _dialogWindow.DialogResult = false;
+            _dialogWindow.Close();
         }
     }
 }

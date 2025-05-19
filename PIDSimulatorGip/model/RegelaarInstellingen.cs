@@ -14,13 +14,15 @@ namespace PIDSimulatorGip.model
         private double _y;
         private double _w;
 
-        private double _vsfP;
+        private double _kp;
 
-        private double _vsfI;
+        private double _ki;
 
-        private double _vsfD;
+        private double _kd;
 
-        private double _tijdsconstante;
+        private double _kc;
+
+        private double _samplingRate = 1;
 
         private double[] _foutWaardes = new double[3];
         private double[] _meetWaardes = new double[3];
@@ -31,6 +33,8 @@ namespace PIDSimulatorGip.model
         private double _dWaarde;
 
         private double _prevStuurWaarde;
+        private double _prevIWaarde;
+
 
 
         #region instantievariabelen
@@ -46,10 +50,10 @@ namespace PIDSimulatorGip.model
         {
             get { return _dWaarde; }
         }
-        public double Tijdsconstante
+        public double SamplingRate
         {
-            get {return _tijdsconstante;}
-            set { if (value >= 0) { _tijdsconstante = value; } }
+            get { return _samplingRate; }
+            set { if (value >= 0) { _samplingRate = value; } }
         }
 
         public string Type
@@ -105,57 +109,72 @@ namespace PIDSimulatorGip.model
             }
         }
 
-        public double VSFP
+        public double Kp
         {
             get
             {
-                return _vsfP;
+                return _kp;
             }
             set
             {
                 if (value >= 0)
                 {
-                    _vsfP = value;
+                    _kp = value;
                 }
             }
         }
-        public double VSFI
+        public double Ki
         {
             get
             {
-                return _vsfI;
+                return _ki;
             }
             set
             {
                 if (value >= 0)
                 {
-                    _vsfI = value;
+                    _ki = value;
                 }
             }
         }
-        public double VSFD
+        public double Kd
         {
             get
             {
-                return _vsfD;
+                return _kd;
             }
             set
             {
                 if (value >= 0)
                 {
-                    _vsfD = value;
+                    _kd = value;
+                }
+            }
+        }
+
+        public double Kc
+        {
+            get
+            {
+                return _kc;
+            }
+            set
+            {
+                if (value >= 0)
+                {
+                    _kc = value;
                 }
             }
         }
         #endregion
         #endregion
 
-        private void RegelaarBerekening()
+        public double Berekening()
         {
             switch (_type)
             {
                 case "Type A":
-                    ArrayAdd(_foutWaardes, Fout()); 
+                    ArrayAdd(_foutWaardes, Fout());
                     TypeA();
                     break;
                 case "Type B":
@@ -165,21 +184,14 @@ namespace PIDSimulatorGip.model
                 case "Type C":
                     TypeC();
                     break;
+                case "Standaard":
+                    ArrayAdd(_foutWaardes, Fout());
+                    standaard();
+                    break;
             }
-        }
 
-        public double Berekening()
-        {
-            RegelaarBerekening();
-            if (Y == 0)
-            {
-                return _prevStuurWaarde;
-            }
-            else
-            {
-                _prevStuurWaarde = Y;
-                return Y;
-            }
+            _prevStuurWaarde = Y;
+            return Y;
 
         }
 
@@ -187,16 +199,16 @@ namespace PIDSimulatorGip.model
         private void TypeA()
         {
 
-            if (_vsfP != 0) _pWaarde = _vsfP * (_foutWaardes[0] - _foutWaardes[1]);
-            if (_vsfI != 0) _iWaarde = _vsfI * _foutWaardes[0] * _tijdsconstante;
-             if(_vsfD != 0)_dWaarde = (_vsfD / _tijdsconstante) * (_foutWaardes[0] - (2 * _foutWaardes[1]) + _foutWaardes[2]);
+            _pWaarde = _kp * (_foutWaardes[0] - _foutWaardes[1]);
+            _iWaarde = _ki * _foutWaardes[0] * _samplingRate;
+            _dWaarde = (_kd / _samplingRate) * (_foutWaardes[0] - (2 * _foutWaardes[1]) + _foutWaardes[2]);
 
-                double temp = _prevStuurWaarde + _pWaarde + _iWaarde + _dWaarde;
-            if(temp < 0)
+            double temp = _prevStuurWaarde + _pWaarde + _iWaarde + _dWaarde;
+            if (temp < 0)
             {
                 temp = 0;
             }
-            else if(temp > 100)
+            else if (temp > 100)
             {
                 temp = 100;
             }
@@ -205,9 +217,9 @@ namespace PIDSimulatorGip.model
 
         private void TypeB()
         {
-           if (_vsfP != 0) _pWaarde = _vsfP * (_foutWaardes[0] - _foutWaardes[1]);
-           if (_vsfI != 0) _iWaarde = _vsfI * _foutWaardes[0] * _tijdsconstante;
-           if(_vsfD != 0) _dWaarde = (_vsfD / _tijdsconstante) * (_meetWaardes[0] - (2 * _meetWaardes[1]) + _meetWaardes[2]);
+            _pWaarde = _kp * (_foutWaardes[0] - _foutWaardes[1]);
+            _iWaarde = _ki * _foutWaardes[0] * _samplingRate;
+            _dWaarde = (_kd / _samplingRate) * (_meetWaardes[0] - (2 * _meetWaardes[1]) + _meetWaardes[2]);
 
 
             double temp = _prevStuurWaarde + _pWaarde + _iWaarde - _dWaarde;
@@ -224,9 +236,9 @@ namespace PIDSimulatorGip.model
 
         private void TypeC()
         {
-            if (_vsfP != 0) _pWaarde = _vsfP * (_meetWaardes[0] - _meetWaardes[1]);
-            if (_vsfI != 0) _iWaarde = _vsfI * Fout() * _tijdsconstante;
-            if (_vsfD != 0) _dWaarde = (_vsfD / _tijdsconstante) * (_meetWaardes[0] - (2 * _meetWaardes[1]) + _meetWaardes[2]);
+            _pWaarde = _kp * (_meetWaardes[0] - _meetWaardes[1]);
+            _iWaarde = _ki * Fout() * _samplingRate;
+            _dWaarde = (_kd / _samplingRate) * (_meetWaardes[0] - (2 * _meetWaardes[1]) + _meetWaardes[2]);
 
 
             double temp = _prevStuurWaarde - _pWaarde + _iWaarde - _dWaarde;
@@ -241,13 +253,48 @@ namespace PIDSimulatorGip.model
             Y = temp;
         }
 
+        private void standaard()
+        {
+            _kc = (1 / _kp) * 100;
+
+            _pWaarde = _kc * _foutWaardes[0];
+            if (_pWaarde <= 0)
+            {
+                _pWaarde = 0;
+            }
+            if (_pWaarde > 100)
+            {
+                _pWaarde = 100;
+            }
+
+            if (_ki != 0)
+            {
+                _iWaarde = _prevIWaarde + (_kc / _ki) * _foutWaardes[0] * _samplingRate;
+            }
+            _dWaarde = (-_kc * (_kd / 60)) * ((_meetWaardes[0] - _meetWaardes[1]) / _samplingRate);
+
+            _prevIWaarde = _iWaarde;
+
+            double temp = _pWaarde + _iWaarde + _dWaarde;
+            if (temp <= 0)
+            {
+                temp = 0;
+            }
+            else if (temp > 100)
+            {
+                temp = 100;
+            }
+            _prevStuurWaarde = temp;
+            Y = temp;
+        }
+
         private double Fout()
         {
             return _w - _meetWaardes[0];
         }
         #endregion
 
-        #region arrayAddFunctions
+        #region arrayFunctions
 
         private void ArrayAdd(double[] array, double value)
         {
@@ -258,6 +305,16 @@ namespace PIDSimulatorGip.model
             array[0] = value;
         }
         #endregion
+
+        public void Reset()
+        {
+            for (int i = 0; i < 3; i++)
+            {
+                ArrayAdd(_meetWaardes, 0);
+                ArrayAdd(_foutWaardes, 0);
+            }
+            _prevStuurWaarde = 0;
+        }
 
     }
 }

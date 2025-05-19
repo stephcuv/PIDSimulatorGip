@@ -8,33 +8,33 @@ namespace PIDSimulatorGip.model
 {
     class ProcesBerekening
     {
-        private double _kracht;
-        private string? _orde;
-        private bool _krachtBerState;
-
-        private byte _dodeTijd; //dodentijd enkel voor simulator
-        private double T = 0;
-        private double _tijdsconstante;
-        private double _procesVerschil = 0;
-
+        private double _tijdconstante;
         public string? DodetijdChoice;
 
+        private string? _orde;
+        private bool _krachtBerState;
+        private double _prevProcesUitkomst;
+
+        private byte _dodeTijd; //dodentijd enkel voor simulator
+        private double _t = 0;
+        private double _tijdStap;
+        private double _procesVerschil = 0;
+        private double _prevStuurwaarde;
         private double[] _procesUitkomsten;
 
         #region variabelen
-
-        public double Kracht
+        public double Tijdconstante
         {
              get
-            { return _kracht; }
+            { return _tijdconstante; }
             set
             {
-                _kracht = value;
+                _tijdconstante = value;
             }
         }
         public string Orde
         {
-             get
+            get
             {
                 return _orde;
             }
@@ -52,16 +52,16 @@ namespace PIDSimulatorGip.model
         }
         public string DodeTijd
         {
-            get {return DodetijdChoice;}
+            get { return DodetijdChoice; }
             set
             {
-                if(string.IsNullOrEmpty(value)){return;}
+                if (string.IsNullOrEmpty(value)) { return; }
                 DodetijdChoice = value.Substring(value.IndexOf(":") + 2);
                 switch (DodetijdChoice)
                 {
                     case "geen dodetijd":
                         _dodeTijd = 2;
-                            break;
+                        break;
                     case "klein beetje dodetijd":
                         _dodeTijd = 3;
                         break;
@@ -81,19 +81,142 @@ namespace PIDSimulatorGip.model
                 _procesUitkomsten = new double[_dodeTijd];
             }
         }
-        public double Tijdsconstante
+        public double TijdStap
 
         {
-            set { if (value >= 0) { _tijdsconstante = value; } }
+            set { if (value > 0) { _tijdStap = value; } } get { return _tijdStap; }   
         }
 
+        public double T
+
+        {
+            set { _t = 0; }
+        }
         public double ProcesWaarde
         {
             get { return _procesUitkomsten[0]; }
         }
+        public double ProcesVerschil
+        {
+            get { return _procesVerschil; }
+        }
+        private double _e;
+        public double E
+        {
+            set { _e = value; }
+            get { return _e; }
+        }
+        public double PrevProcesWaarde
+        {
+            get { return _prevProcesUitkomst; }
+        }
         #endregion
 
         #region 
+
+
+        #endregion
+
+
+        public double Proces(double Y)
+        {
+            double X = 0;
+            try
+            {
+                if (Y == _prevStuurwaarde)
+                {
+                    X = ProcesKrachtGelijk();
+                }
+                else if (Y > _prevStuurwaarde)
+                {
+                    _prevProcesUitkomst = _procesUitkomsten[0];
+                    _procesVerschil = _procesUitkomsten[0] - Y;
+
+                    X = BeginStijgen();
+                }
+                else if (Y < _prevStuurwaarde)
+                {
+                    _prevProcesUitkomst = _procesUitkomsten[0];
+                    _procesVerschil = Y - _procesUitkomsten[0];
+
+                    X = BeginDalen();
+                }
+                _t += _tijdStap;
+
+                double value = Math.Round(X, 4);
+                _prevStuurwaarde = Y;
+                ArrayCheck(value);
+                return _procesUitkomsten[_dodeTijd - 2];
+            }
+            catch (Exception) { ArrayCheck(0); return 0; }
+        }
+
+
+        #region functies proces kracht berekeningen
+        private double ProcesKrachtGelijk()
+        {
+            double X;
+            if (_krachtBerState)
+            {
+                X = BeginDalen();
+            }
+            else
+            {
+                X = BeginStijgen();
+            }
+            return X;
+        }
+        private double BeginDalen()
+        {
+            _krachtBerState = true;
+            double _procesUitkomst = 0;
+            double macht = -_t / Tijdconstante;
+            double e = Math.Exp(macht);
+            switch (Orde)
+            {
+                case "0orde":
+                    _procesUitkomst = _prevProcesUitkomst + (_procesVerschil / Tijdconstante);
+                    break;
+                case "1orde":
+                    _procesUitkomst = _prevProcesUitkomst + (_procesVerschil * (1 - e));
+                    break;
+                case "2orde":
+                    _procesUitkomst = _prevProcesUitkomst + (_procesVerschil * (1 - e) * (1 - e));
+                    break;
+            }
+            return _procesUitkomst;
+        }
+
+        private double BeginStijgen()
+        {
+            _krachtBerState = false;
+            double _procesUitkomst = 0;
+            double macht = -_t / Tijdconstante;
+            double e = Math.Exp(macht);
+            switch (Orde)
+            {
+                case "0orde":
+                    _procesUitkomst = _prevProcesUitkomst - (_procesVerschil / Tijdconstante);
+                    break;
+                case "1orde":
+                    _procesUitkomst = _prevProcesUitkomst - (_procesVerschil * (1 - e));
+                    break;
+                case "2orde":
+                    _procesUitkomst = _prevProcesUitkomst - (_procesVerschil * (1 - e) * (1 - e));
+                    break;
+            }
+            return _procesUitkomst;
+        }
+
+        public void Reset()
+        {
+            foreach (double i in _procesUitkomsten)
+            {
+                ArrayCheck(0);
+            }
+            _procesVerschil = 0;
+            _t = 0;
+        }
         private void ArrayCheck(double waarde)
         {
             for (int i = _dodeTijd - 1; i > 0; i--)
@@ -101,101 +224,6 @@ namespace PIDSimulatorGip.model
                 _procesUitkomsten[i] = _procesUitkomsten[i - 1];
             }
             _procesUitkomsten[0] = waarde;
-        }
-
-        #endregion
-
-        public double Proces(double Y)
-        {
-            double X = 0;
-            try
-            {
-
-
-                if (Y == _procesUitkomsten[1])
-                {
-                    _procesVerschil = 0;
-                    X = ProcesKrachtGelijk();
-                }
-                else if (Y < _procesUitkomsten[1])
-                {
-                    _procesVerschil = Y - _procesUitkomsten[1];
-                    X = ProcesKrachtStijgend();
-                }
-                else if (Y > _procesUitkomsten[1])
-                {
-                    _procesVerschil = _procesUitkomsten[1] - Y;
-                    X = ProcesKrachtDalend();
-                }
-
-                double value = Math.Round(X, 4);
-                ArrayCheck(value);
-                return _procesUitkomsten[_dodeTijd - 1];
-            }
-            catch (Exception) { ArrayCheck(0); return 0; }
-        }
-
-        #region functies proces kracht berekeningen
-        private double ProcesKrachtGelijk()
-        {
-            double X;
-            T = 0;
-            if (_krachtBerState)
-            {
-                X = ProcesKrachtStijgend();
-            }
-            else
-            {
-                X = ProcesKrachtDalend();
-            }
-            return X;
-        }
-        private double ProcesKrachtStijgend()
-        {
-            _krachtBerState = true;
-            double _procesUitkomst = 0;
-            double macht = -T / Kracht;
-            double e = Math.Pow(Math.E, macht);
-            switch (Orde)
-            {
-                case "0orde":
-                    _procesUitkomst = _procesUitkomsten[1] + (_procesVerschil / Kracht);
-                    T += _tijdsconstante;
-                    break;
-                case "1orde":
-                    _procesUitkomst = _procesUitkomsten[1] + (_procesVerschil * (1 - e));
-                    T += _tijdsconstante;
-                    break;
-                case "2orde":
-                    _procesUitkomst = _procesUitkomsten[1] + ((_procesVerschil * (1 - e)) * (1 - e));
-                    T += _tijdsconstante;
-                    break;
-            }
-            return _procesUitkomst;
-        }
-
-        private double ProcesKrachtDalend()
-        {
-            _krachtBerState = false;
-            double _procesUitkomst = 0;
-            double macht = -T / Kracht;
-            double e = Math.Pow(Math.E, macht);
-            switch (Orde)
-            {
-                case "0orde":
-                    _procesUitkomst = _procesUitkomsten[1] - (_procesVerschil / Kracht);
-                    T += _tijdsconstante;
-                    break;
-                case "1orde":
-                    _procesUitkomst = _procesUitkomsten[1] - (_procesVerschil * (1 - e));
-                    T += _tijdsconstante;
-                    break;
-                case "2orde":
-                    _procesUitkomst = _procesUitkomsten[1] - ((_procesVerschil * (1 - e)) * (1 - e));
-                    T += _tijdsconstante;
-                    break;
-            }
-            return _procesUitkomst;
         }
         #endregion 
     }

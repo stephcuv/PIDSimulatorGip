@@ -32,47 +32,63 @@
                             <WrapPanel HorizontalAlignment="Center">
                                 <TextBlock Text="type" FontSize="15" Foreground="Black" Margin="0,0,5,0"/>
                                 <ComboBox IsEnabled="{Binding IsRunning}" Height="20" Width="150" SelectedValue="{Binding Type}">
+                                    <ComboBoxItem Content="Standaard" IsSelected="True"/>
                                     <ComboBoxItem Content="Type A"/>
                                     <ComboBoxItem Content="Type B"/>
                                     <ComboBoxItem Content="Type C"/>
+
                                 </ComboBox>
                             </WrapPanel>
+
+                            <TextBlock HorizontalAlignment="Center" FontSize="15" Foreground="Black" Text="kp waarde "/>
+                            
                             <WrapPanel HorizontalAlignment="Center">
-                                <TextBlock FontSize="15" Foreground="Black" Text="P - actie waarde "/>
-                                <TextBlock FontSize="15" Foreground="Black" Text="{Binding PWaarde}"/>
-                            </WrapPanel>
-                            <WrapPanel HorizontalAlignment="Center">
-                                <Slider  Minimum="0" Maximum="5" Width="150" Value="{Binding VSFP}"/>
+                                <Slider  Minimum="0" Maximum="{Binding KpMax}" Width="150" Value="{Binding Kp}"/>
                                 <StackPanel>
-                                    <Button Content="▲" Command="{Binding AdjustValueCommand}" CommandParameter="PUp" FontSize="8" BorderThickness="0" Height="11" Background="Transparent"/>
-                                    <Button Content="▼" Command="{Binding AdjustValueCommand}" CommandParameter="PDown" FontSize="8" BorderThickness="0" Height="11" Background="Transparent"/>
+                                    <Button Content="▲" Command="{Binding AdjustValueCommand}" CommandParameter="KpUp" FontSize="8" BorderThickness="0" Height="11" Background="Transparent"/>
+                                    <Button Content="▼" Command="{Binding AdjustValueCommand}" CommandParameter="KpDown" FontSize="8" BorderThickness="0" Height="11" Background="Transparent"/>
                                 </StackPanel>
-                                <TextBlock FontSize="15" Foreground="Black" Text="{Binding VSFP, StringFormat=F3}" Margin="3,0"/>
+                                <TextBlock FontSize="15" Foreground="Black" Text="{Binding Kp, StringFormat=F3}" Margin="3,0"/>
                             </WrapPanel>
+
+
+                            <TextBlock HorizontalAlignment="Center" FontSize="15" Foreground="Black" Text="ki waarde "/>
+
                             <WrapPanel HorizontalAlignment="Center">
-                                <TextBlock FontSize="15" Foreground="Black" Text="I - actie waarde "/>
-                                <TextBlock FontSize="15" Foreground="Black" Text="{Binding IWaarde}"/>
-                            </WrapPanel>
-                            <WrapPanel HorizontalAlignment="Center">
-                                <Slider Minimum="0" Maximum="5" Width="150" Value="{Binding VSFI}"/>
+                                <Slider Minimum="0" Maximum="{Binding KiMax}" Width="150" Value="{Binding Ki}"/>
                                 <StackPanel>
-                                    <Button Content="▲" Command="{Binding AdjustValueCommand}" CommandParameter="IUp" FontSize="8" BorderThickness="0" Height="11" Background="Transparent"/>
-                                    <Button Content="▼" Command="{Binding AdjustValueCommand}" CommandParameter="IDown" FontSize="8" BorderThickness="0" Height="11" Background="Transparent"/>
+                                    <Button Content="▲" Command="{Binding AdjustValueCommand}" CommandParameter="KiUp" FontSize="8" BorderThickness="0" Height="11" Background="Transparent"/>
+                                    <Button Content="▼" Command="{Binding AdjustValueCommand}" CommandParameter="KiDown" FontSize="8" BorderThickness="0" Height="11" Background="Transparent"/>
                                 </StackPanel>
-                                <TextBlock FontSize="15" Foreground="Black" Text="{Binding VSFI, StringFormat=F3}" Margin="3,0"/>
+                                <TextBlock FontSize="15" Foreground="Black" Text="{Binding Ki, StringFormat=F3}" Margin="3,0"/>
                             </WrapPanel>
+
+
+
+                            <TextBlock HorizontalAlignment="Center" FontSize="15" Foreground="Black" Text="kd waarde "/>
+
                             <WrapPanel HorizontalAlignment="Center">
-                                <TextBlock FontSize="15" Foreground="Black" Text="D - actie waarde "/>
-                                <TextBlock FontSize="15" Foreground="Black" Text="{Binding DWaarde}"/>
-                            </WrapPanel>
-                            <WrapPanel HorizontalAlignment="Center">
-                                <Slider Minimum="0" Maximum="5" Width="150" Value="{Binding VSFD}"/>
+                                <Slider Minimum="0" Maximum="{Binding KdMax}" Width="150" Value="{Binding Kd}"/>
                                 <StackPanel>
-                                    <Button Content="▲" Command="{Binding AdjustValueCommand}" CommandParameter="DUp" FontSize="8" BorderThickness="0" Height="11" Background="Transparent"/>
-                                    <Button Content="▼" Command="{Binding AdjustValueCommand}" CommandParameter="DDown" FontSize="8" BorderThickness="0" Height="11" Background="Transparent"/>
+                                    <Button Content="▲" Command="{Binding AdjustValueCommand}" CommandParameter="KdUp" FontSize="8" BorderThickness="0" Height="11" Background="Transparent"/>
+                                    <Button Content="▼" Command="{Binding AdjustValueCommand}" CommandParameter="KdDown" FontSize="8" BorderThickness="0" Height="11" Background="Transparent"/>
                                 </StackPanel>
-                                <TextBlock FontSize="15" Foreground="Black" Text="{Binding VSFD, StringFormat=F3}" Margin="3,0"/>
+                                <TextBlock FontSize="15" Foreground="Black" Text="{Binding Kd, StringFormat=F3}" Margin="3,0"/>
                             </WrapPanel>
+
+
+                            <TextBlock FontSize="15" Foreground="Black" Text="sampling rate " HorizontalAlignment="Center"/>
+
+                            <WrapPanel HorizontalAlignment="Center">
+                                <Slider Minimum="0.5" Maximum="5" Width="150" Value="{Binding SamplingRate}"/>
+                                <StackPanel>
+                                    <Button Content="▲" Command="{Binding AdjustValueCommand}" CommandParameter="SRUp" FontSize="8" BorderThickness="0" Height="11" Background="Transparent"/>
+                                    <Button Content="▼" Command="{Binding AdjustValueCommand}" CommandParameter="SRDown" FontSize="8" BorderThickness="0" Height="11" Background="Transparent"/>
+                                </StackPanel>
+                                <TextBlock FontSize="15" Foreground="Black" Text="{Binding SamplingRate, StringFormat=F3}" Margin="3,0"/>
+                            </WrapPanel>
+
+
                         </StackPanel>
                     </Border>
                 </Grid>
@@ -132,7 +148,7 @@
 
                             <TextBlock  Text="simulatiesnelheid" Grid.Row="3" FontSize="15" Foreground="RoyalBlue" Grid.ColumnSpan="3" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="2" Visibility="{Binding SimulatieSnelheidVisibility}"/>
                             <WrapPanel  Grid.Row="4" Grid.ColumnSpan="3" Visibility="{Binding SimulatieSnelheidVisibility}">
-                                <Slider Margin="5,0" Minimum="1" Maximum="5" Width="250" IsEnabled="{Binding IsRunning}" Value="{Binding SimulatieSnelheid}"/>
+                                <Slider Margin="5,0" Minimum="1" Maximum="5" Width="250" Value="{Binding SimulatieSnelheid}"/>
                                 <TextBlock Margin="5,0" Text="{Binding SimulatieSnelheid, StringFormat=F2}" FontSize="15" Foreground="RoyalBlue"/>
                             </WrapPanel>
 
@@ -141,7 +157,7 @@
 
                             <WrapPanel Grid.Row="6" Grid.ColumnSpan="3" Margin="2,0">
                                 <TextBlock Text="PID berekeningen appart zichtbaar op graph" FontSize="15" Foreground="RoyalBlue" Grid.Row="6" Grid.ColumnSpan="2"/>
-                                <CheckBox Grid.Row="6" IsChecked="{Binding PIDBerekeningenZichtbaar}" IsEnabled="{Binding PIDBerekeningenCB}" Grid.Column="3" VerticalAlignment="Bottom" Margin="5,0"/>
+                                <CheckBox Grid.Row="6" Command="{Binding PIDBerekeningenZichtbaarCommand}" CommandParameter="{Binding IsChecked, RelativeSource={RelativeSource Self}}" Grid.Column="3" VerticalAlignment="Bottom" Margin="5,0"/>
                             </WrapPanel>
 
                             <Button  Command="{Binding StartCommand}" Foreground="RoyalBlue" Margin="25,10" Height="20" Width="50" Background="White" BorderBrush="RoyalBlue" Grid.Row="7" Content="start"/>
@@ -171,36 +187,28 @@
                     </Grid.ColumnDefinitions>
 
                     <WrapPanel Grid.ColumnSpan="3">
-                        <TextBlock Text="proceskracht" FontSize="15" Foreground="Green" Margin="2,0,2,0"/>
-                        <Slider Minimum="0" Maximum="5" Width="150" Value="{Binding Kracht, Mode=TwoWay}"/>
-                        <StackPanel>
-                            <Button Content="▲" Command="{Binding AdjustValueCommand}" CommandParameter="PKUp" FontSize="8" BorderThickness="0" Height="11" Background="Transparent"/>
-                            <Button Content="▼" Command="{Binding AdjustValueCommand}" CommandParameter="PKDown" FontSize="8" BorderThickness="0" Height="11" Background="Transparent"/>
-                        </StackPanel>
-                        <TextBlock Text="{Binding Kracht, StringFormat=F2}" FontSize="15" Foreground="Green" Margin="2,0,2,0" />
-                    </WrapPanel>
-
-                    <WrapPanel Grid.Column="4" Grid.ColumnSpan="3">
-                        <TextBlock Text="tijdsconstante" FontSize="15" Foreground="Green" Grid.Column="4" Margin="0,0,5,0"/>
-                        <Slider Minimum="0" Maximum="5" Width="150" IsEnabled="{Binding IsRunning}" Value="{Binding TijdsConstante, Mode=TwoWay}"/>
+                        <TextBlock Text="Tijdconstante" FontSize="15" Foreground="Green" Margin="2,0,2,0"/>
+                        <Slider Minimum="{Binding TijdconstanteMin}" Maximum="{Binding TijdconstanteMax}" Width="150" Value="{Binding Tijdconstante, Mode=TwoWay}"/>
                         <StackPanel>
                             <Button Content="▲" Command="{Binding AdjustValueCommand}" CommandParameter="DtUp" FontSize="8" BorderThickness="0" Height="11" Background="Transparent"/>
                             <Button Content="▼" Command="{Binding AdjustValueCommand}" CommandParameter="DtDown" FontSize="8" BorderThickness="0" Height="11" Background="Transparent"/>
                         </StackPanel>
-                        <TextBlock Text="{Binding TijdsConstante, StringFormat=F3}" FontSize="15" Foreground="Green" Margin="10,0,2,0"/>
+                        <TextBlock Text="{Binding Tijdconstante, StringFormat=F2}" FontSize="15" Foreground="Green" Margin="2,0,2,0" />
                     </WrapPanel>
+
+
                     <WrapPanel Grid.Row="1">
                         <TextBlock Text="proces orde" FontSize="15" Foreground="Green" Margin="2"/>
                         <ComboBox  Height="20" Width="100" HorizontalAlignment="Left" VerticalAlignment="Top" IsEnabled="{Binding IsRunning}" SelectedValue="{Binding Orde, Mode=TwoWay}">
                             <ComboBoxItem Content="0orde"/>
-                            <ComboBoxItem Content="1orde"/>
+                            <ComboBoxItem Content="1orde" IsSelected="True"/>
                             <ComboBoxItem Content="2orde"/>
                         </ComboBox>
                     </WrapPanel>
                     <WrapPanel Grid.Row="1" Grid.Column="1">
                         <TextBlock Text="dodetijd" HorizontalAlignment="Right" FontSize="15" Foreground="Green" Margin="2"/>
                         <ComboBox Height="20" Width="150" HorizontalAlignment="Left" VerticalAlignment="Top" IsEnabled="{Binding IsRunning}" SelectedValue="{Binding DodeTijd, Mode=TwoWay}">
-                            <ComboBoxItem Content="geen dodetijd"/>
+                            <ComboBoxItem Content="geen dodetijd" IsSelected="True"/>
                             <ComboBoxItem Content="klein beetje dodetijd"/>
                             <ComboBoxItem Content="wat dodetijd"/>
                             <ComboBoxItem Content="gemiddeld dodetijd"/>
