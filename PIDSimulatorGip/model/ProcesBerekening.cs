@@ -17,7 +17,7 @@ namespace PIDSimulatorGip.model
 
         private byte _dodeTijd; //dodentijd enkel voor simulator
         private double _t = 0;
-        private double _tijdStap;
+        private double _tijdStap = 1;
         private double _procesVerschil = 0;
         private double _prevStuurwaarde;
         private double[] _procesUitkomsten;
@@ -110,13 +110,9 @@ namespace PIDSimulatorGip.model
         {
             get { return _prevProcesUitkomst; }
         }
+
+        public bool StapsprongOn { get; set; }
         #endregion
-
-        #region 
-
-
-        #endregion
-
 
         public double Proces(double Y)
         {
@@ -125,27 +121,44 @@ namespace PIDSimulatorGip.model
             {
                 if (Y == _prevStuurwaarde)
                 {
-                    X = ProcesKrachtGelijk();
+                    if(!StapsprongOn) _prevProcesUitkomst = _procesUitkomsten[0];
+
+                    if (_krachtBerState)
+                    {
+                        X = BeginStijgen();
+                    }
+                    else
+                    {
+                        X = BeginDalen();
+                    }
                 }
                 else if (Y > _prevStuurwaarde)
                 {
                     _prevProcesUitkomst = _procesUitkomsten[0];
                     _procesVerschil = _procesUitkomsten[0] - Y;
 
-                    X = BeginStijgen();
+                    X = BeginDalen();
                 }
                 else if (Y < _prevStuurwaarde)
                 {
                     _prevProcesUitkomst = _procesUitkomsten[0];
                     _procesVerschil = Y - _procesUitkomsten[0];
 
-                    X = BeginDalen();
+                    X = BeginStijgen();
                 }
-                _t += _tijdStap;
 
-                double value = Math.Round(X, 4);
-                _prevStuurwaarde = Y;
+                double value = Math.Round(X, 2);
+                value = Math.Clamp(value, 0, 100);
                 ArrayCheck(value);
+
+                if(_t != 0) if (Math.Abs(_procesUitkomsten[0] - _procesUitkomsten[1]) < 0.01)
+                {
+                    _t = 0;
+                } 
+                
+                _t += _tijdStap;
+                _prevStuurwaarde = Y;
+
                 return _procesUitkomsten[_dodeTijd - 2];
             }
             catch (Exception) { ArrayCheck(0); return 0; }
@@ -153,25 +166,13 @@ namespace PIDSimulatorGip.model
 
 
         #region functies proces kracht berekeningen
-        private double ProcesKrachtGelijk()
-        {
-            double X;
-            if (_krachtBerState)
-            {
-                X = BeginDalen();
-            }
-            else
-            {
-                X = BeginStijgen();
-            }
-            return X;
-        }
-        private double BeginDalen()
+        private double BeginStijgen()
         {
             _krachtBerState = true;
             double _procesUitkomst = 0;
             double macht = -_t / Tijdconstante;
             double e = Math.Exp(macht);
+            E = e;
             switch (Orde)
             {
                 case "0orde":
@@ -187,12 +188,13 @@ namespace PIDSimulatorGip.model
             return _procesUitkomst;
         }
 
-        private double BeginStijgen()
+        private double BeginDalen()
         {
             _krachtBerState = false;
             double _procesUitkomst = 0;
             double macht = -_t / Tijdconstante;
             double e = Math.Exp(macht);
+            E = e;
             switch (Orde)
             {
                 case "0orde":

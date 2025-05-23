@@ -31,7 +31,7 @@
                             <TextBlock FontSize="18" Foreground="Black" HorizontalAlignment="Center" Text="regelaar"/>
                             <WrapPanel HorizontalAlignment="Center">
                                 <TextBlock Text="type" FontSize="15" Foreground="Black" Margin="0,0,5,0"/>
-                                <ComboBox IsEnabled="{Binding IsRunning}" Height="20" Width="150" SelectedValue="{Binding Type}">
+                                <ComboBox IsEnabled="{Binding IsRunning}" Height="20" Width="150" SelectedItem="{Binding Type}">
                                     <ComboBoxItem Content="Standaard" IsSelected="True"/>
                                     <ComboBoxItem Content="Type A"/>
                                     <ComboBoxItem Content="Type B"/>
@@ -105,7 +105,7 @@
                             </WrapPanel>
                             <Slider Minimum="0" Maximum="100" Value="{Binding StapsprongWaarde}"/>
                             <WrapPanel HorizontalAlignment="Center">
-                                <TextBlock FontSize="15" Foreground="Red" Text="spong waarde "/>
+                                <TextBlock FontSize="15" Foreground="Red" Text="sprong waarde "/>
                                 <TextBlock FontSize="15" Foreground="Red" Text="{Binding StapsprongChangeWaarde, StringFormat=F2}" Margin="3,0"/>
                             </WrapPanel>
                             <Slider Minimum="-50" Maximum="50" Value="{Binding StapsprongChangeWaarde}"/>
@@ -199,15 +199,15 @@
 
                     <WrapPanel Grid.Row="1">
                         <TextBlock Text="proces orde" FontSize="15" Foreground="Green" Margin="2"/>
-                        <ComboBox  Height="20" Width="100" HorizontalAlignment="Left" VerticalAlignment="Top" IsEnabled="{Binding IsRunning}" SelectedValue="{Binding Orde, Mode=TwoWay}">
+                        <ComboBox  Height="20" Width="100" HorizontalAlignment="Left" VerticalAlignment="Top" IsEnabled="{Binding IsRunning}" SelectedItem="{Binding Orde}">
                             <ComboBoxItem Content="0orde"/>
-                            <ComboBoxItem Content="1orde" IsSelected="True"/>
-                            <ComboBoxItem Content="2orde"/>
+                            <ComboBoxItem Content="1orde"/>
+                            <ComboBoxItem Content="2orde" IsSelected="True"/>
                         </ComboBox>
                     </WrapPanel>
                     <WrapPanel Grid.Row="1" Grid.Column="1">
                         <TextBlock Text="dodetijd" HorizontalAlignment="Right" FontSize="15" Foreground="Green" Margin="2"/>
-                        <ComboBox Height="20" Width="150" HorizontalAlignment="Left" VerticalAlignment="Top" IsEnabled="{Binding IsRunning}" SelectedValue="{Binding DodeTijd, Mode=TwoWay}">
+                        <ComboBox Height="20" Width="150" HorizontalAlignment="Left" VerticalAlignment="Top" IsEnabled="{Binding IsRunning}" SelectedItem="{Binding DodeTijd, Mode=TwoWay}">
                             <ComboBoxItem Content="geen dodetijd" IsSelected="True"/>
                             <ComboBoxItem Content="klein beetje dodetijd"/>
                             <ComboBoxItem Content="wat dodetijd"/>

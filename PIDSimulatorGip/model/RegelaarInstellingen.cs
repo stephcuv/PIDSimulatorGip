@@ -190,6 +190,7 @@ namespace PIDSimulatorGip.model
                     break;
             }
 
+            Y = Math.Round(Y, 2);
             _prevStuurWaarde = Y;
             return Y;
 
@@ -255,10 +256,11 @@ namespace PIDSimulatorGip.model
 
         private void standaard()
         {
+
             _kc = (1 / _kp) * 100;
 
             _pWaarde = _kc * _foutWaardes[0];
-            if (_pWaarde <= 0)
+            if (_pWaarde < 0)
             {
                 _pWaarde = 0;
             }
@@ -267,11 +269,13 @@ namespace PIDSimulatorGip.model
                 _pWaarde = 100;
             }
 
+
+
             if (_ki != 0)
             {
                 _iWaarde = _prevIWaarde + (_kc / _ki) * _foutWaardes[0] * _samplingRate;
             }
-            _dWaarde = (-_kc * (_kd / 60)) * ((_meetWaardes[0] - _meetWaardes[1]) / _samplingRate);
+            _dWaarde = -_kc * (_kd/60) * ((_meetWaardes[0] - _meetWaardes[1]) / _samplingRate);
 
             _prevIWaarde = _iWaarde;
 

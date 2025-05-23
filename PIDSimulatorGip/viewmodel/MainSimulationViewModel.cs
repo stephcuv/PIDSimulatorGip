@@ -104,6 +104,7 @@ namespace PIDSimulatorGip.viewmodel
         private void StapsprongGridVisibility()
         {
             _stapsprongSimStatus = !_stapsprongSimStatus;
+            _proces.StapsprongOn = !_stapsprongSimStatus;
             RegelaarVisibility = (RegelaarVisibility == Visibility.Visible) ? Visibility.Collapsed : Visibility.Visible;
             StapsprongVisibility = (StapsprongVisibility == Visibility.Visible) ? Visibility.Collapsed : Visibility.Visible;
         }
@@ -123,8 +124,8 @@ namespace PIDSimulatorGip.viewmodel
         public double Kp { get { return _RGLR.Kp; } set { if ((_RGLR.Kp + value) >= 0) { _RGLR.Kp = Math.Round(value, 3); } else { _RGLR.Kp = 0; } OnPropertyChanged(); } }
         public double Ki { get { return _RGLR.Ki; } set { if ((_RGLR.Ki + value) >= 0) { _RGLR.Ki = Math.Round(value, 3); } else { _RGLR.Ki = 0; } OnPropertyChanged(); } }
         public double Kd { get { return _RGLR.Kd; } set { if ((_RGLR.Kd + value) >= 0) { _RGLR.Kd = Math.Round(value, 3); } else { _RGLR.Kd = 0; } OnPropertyChanged(); } }
-        public double W { get { return _RGLR.W; } set { if (value >= 0) { _RGLR.W = Math.Round(value, 2); } else { _RGLR.W = 0; } OnPropertyChanged(); } }
-        public string Type { set { _RGLR.Type = value; OnPropertyChanged(); pidStandaardCheck(); } get { return _RGLR.Type; } }
+        public double W { get { return _RGLR.W; } set { if (value >= 0) { _RGLR.W = Math.Round(value, 2); _proces.T = 0; } else { _RGLR.W = 0; } OnPropertyChanged(); } }
+        public string Type { set { _RGLR.Type = value; OnPropertyChanged(); pidStandaardCheck();  } get { return _RGLR.Type; } }
         public double SamplingRate { set { _RGLR.SamplingRate = Math.Round(value, 2); OnPropertyChanged(); } get { return _RGLR.SamplingRate; } }
 
 
@@ -146,7 +147,7 @@ namespace PIDSimulatorGip.viewmodel
                 KpMax = 100;
                 KiMax = 100;
                 KdMax = 100;
-                TijdconstanteMax = 50;
+                TijdconstanteMax = 200;
                 TijdconstanteMin = 1;
                 if (Kp > KpMax) { Kp = KpMax; }
                 if (Tijdconstante > TijdconstanteMax) { Tijdconstante = TijdconstanteMax; }
@@ -168,7 +169,7 @@ namespace PIDSimulatorGip.viewmodel
         }
         #endregion
         #region proces
-        public double Tijdconstante { set { if ((_proces.Tijdconstante + value) >= 0) { _proces.Tijdconstante = Math.Round(value, 2); } else { _proces.Tijdconstante = 0; } OnPropertyChanged(); } get { return _proces.Tijdconstante; } }
+        public double Tijdconstante { set { if ((_proces.Tijdconstante + value) >= 0) { _proces.Tijdconstante = Math.Round(value, 2); } else { _proces.Tijdconstante = 1; } OnPropertyChanged(); } get { return _proces.Tijdconstante; } }
         public string DodeTijd { set { _proces.DodeTijd = value; OnPropertyChanged(); } get { return _proces.DodeTijd; } }
         public string Orde { set { _proces.Orde = value; OnPropertyChanged(); } get { return _proces.Orde; } }
 
@@ -421,15 +422,15 @@ namespace PIDSimulatorGip.viewmodel
             Kp = 0;
             Ki = 0;
             Kd = 0;
-            W = 0;
+            W = 50;
 
             _rglrWaarde = 0;
             SimulatieSnelheid = 1;
-            Tijdconstante = 0;
+            Tijdconstante = 1;
 
-            DodeTijd = string.Empty;
-            Orde = string.Empty;
-            Type = string.Empty;
+            DodeTijd = ": geen dodetijd";
+            Orde = ": 2orde";
+            Type = ": Standaard";
 
             if (_stapsprongSimStatus)
             {
@@ -437,7 +438,7 @@ namespace PIDSimulatorGip.viewmodel
                 StapsprongWaarde = 0;
             }
 
-            Tijdconstante = 0;
+            Tijdconstante = 1;
             ProcesWaarde = 0;
             MaxXAxisPoints = "100";
 
