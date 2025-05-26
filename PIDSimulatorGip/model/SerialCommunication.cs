@@ -129,7 +129,8 @@ namespace PIDSimulatorGip.model
         {
             if (Connected)
             {
-                try { IncomeData = _port.ReadLine(); DataReceived.Invoke(this, IncomeData); }
+                try { IncomeData = _port.ReadLine(); 
+                    DataReceived.Invoke(this, IncomeData.Trim()); }
                 catch (TimeoutException) { Debug.WriteLine("timeout"); }
                 catch (Exception) { Debug.WriteLine("fout tijdens data receiven"); }
             }

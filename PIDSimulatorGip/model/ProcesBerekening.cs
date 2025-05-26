@@ -121,7 +121,10 @@ namespace PIDSimulatorGip.model
             {
                 if (Y == _prevStuurwaarde)
                 {
-                    if(!StapsprongOn) _prevProcesUitkomst = _procesUitkomsten[0];
+                    if (!StapsprongOn)
+                    {
+                        _prevProcesUitkomst = _procesUitkomsten[0];
+                    }
 
                     if (_krachtBerState)
                     {
@@ -151,17 +154,22 @@ namespace PIDSimulatorGip.model
                 value = Math.Clamp(value, 0, 100);
                 ArrayCheck(value);
 
-                if(_t != 0) if (Math.Abs(_procesUitkomsten[0] - _procesUitkomsten[1]) < 0.01)
+                
+                if(_t != 0 && !StapsprongOn) if (Math.Abs(_procesUitkomsten[0] - _procesUitkomsten[1]) < 0.01)
                 {
                     _t = 0;
                 } 
+                
                 
                 _t += _tijdStap;
                 _prevStuurwaarde = Y;
 
                 return _procesUitkomsten[_dodeTijd - 2];
             }
-            catch (Exception) { ArrayCheck(0); return 0; }
+            catch (Exception) 
+            { 
+                ArrayCheck(0); return 0; 
+            }
         }
 
 
@@ -176,7 +184,7 @@ namespace PIDSimulatorGip.model
             switch (Orde)
             {
                 case "0orde":
-                    _procesUitkomst = _prevProcesUitkomst + (_procesVerschil / Tijdconstante);
+                    _procesUitkomst = _prevProcesUitkomst + (_procesVerschil / 1);
                     break;
                 case "1orde":
                     _procesUitkomst = _prevProcesUitkomst + (_procesVerschil * (1 - e));
@@ -198,7 +206,7 @@ namespace PIDSimulatorGip.model
             switch (Orde)
             {
                 case "0orde":
-                    _procesUitkomst = _prevProcesUitkomst - (_procesVerschil / Tijdconstante);
+                    _procesUitkomst = _prevProcesUitkomst - (_procesVerschil / 1);
                     break;
                 case "1orde":
                     _procesUitkomst = _prevProcesUitkomst - (_procesVerschil * (1 - e));
@@ -218,6 +226,7 @@ namespace PIDSimulatorGip.model
             }
             _procesVerschil = 0;
             _t = 0;
+            StapsprongOn = false;
         }
         private void ArrayCheck(double waarde)
         {

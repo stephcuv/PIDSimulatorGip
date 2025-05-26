@@ -85,7 +85,7 @@
                                     <Button Content="▲" Command="{Binding AdjustValueCommand}" CommandParameter="SRUp" FontSize="8" BorderThickness="0" Height="11" Background="Transparent"/>
                                     <Button Content="▼" Command="{Binding AdjustValueCommand}" CommandParameter="SRDown" FontSize="8" BorderThickness="0" Height="11" Background="Transparent"/>
                                 </StackPanel>
-                                <TextBlock FontSize="15" Foreground="Black" Text="{Binding SamplingRate, StringFormat=F3}" Margin="3,0"/>
+                                <TextBlock FontSize="15" Foreground="Black" Text="{Binding SamplingRate, StringFormat=F2}" Margin="3,0"/>
                             </WrapPanel>
 
 
@@ -157,7 +157,7 @@
 
                             <WrapPanel Grid.Row="6" Grid.ColumnSpan="3" Margin="2,0">
                                 <TextBlock Text="PID berekeningen appart zichtbaar op graph" FontSize="15" Foreground="RoyalBlue" Grid.Row="6" Grid.ColumnSpan="2"/>
-                                <CheckBox Grid.Row="6" Command="{Binding PIDBerekeningenZichtbaarCommand}" CommandParameter="{Binding IsChecked, RelativeSource={RelativeSource Self}}" Grid.Column="3" VerticalAlignment="Bottom" Margin="5,0"/>
+                                <CheckBox Grid.Row="6" Command="{Binding PIDBerekeningenZichtbaarCommand}" CommandParameter="{Binding IsChecked, RelativeSource={RelativeSource Self}}" IsEnabled="{Binding PIDBerZichtbaarIsEnabled}" Grid.Column="3" VerticalAlignment="Bottom" Margin="5,0"/>
                             </WrapPanel>
 
                             <Button  Command="{Binding StartCommand}" Foreground="RoyalBlue" Margin="25,10" Height="20" Width="50" Background="White" BorderBrush="RoyalBlue" Grid.Row="7" Content="start"/>
@@ -186,18 +186,14 @@
 
                     </Grid.ColumnDefinitions>
 
-                    <WrapPanel Grid.ColumnSpan="3">
+                    <WrapPanel Grid.ColumnSpan="3" Visibility="{Binding ProcesVisibility}">
                         <TextBlock Text="Tijdconstante" FontSize="15" Foreground="Green" Margin="2,0,2,0"/>
                         <Slider Minimum="{Binding TijdconstanteMin}" Maximum="{Binding TijdconstanteMax}" Width="150" Value="{Binding Tijdconstante, Mode=TwoWay}"/>
-                        <StackPanel>
-                            <Button Content="▲" Command="{Binding AdjustValueCommand}" CommandParameter="DtUp" FontSize="8" BorderThickness="0" Height="11" Background="Transparent"/>
-                            <Button Content="▼" Command="{Binding AdjustValueCommand}" CommandParameter="DtDown" FontSize="8" BorderThickness="0" Height="11" Background="Transparent"/>
-                        </StackPanel>
-                        <TextBlock Text="{Binding Tijdconstante, StringFormat=F2}" FontSize="15" Foreground="Green" Margin="2,0,2,0" />
+                        <TextBlock Text="{Binding Tijdconstante}" FontSize="15" Foreground="Green" Margin="2,0,2,0" />
                     </WrapPanel>
 
 
-                    <WrapPanel Grid.Row="1">
+                    <WrapPanel Grid.Row="1" Visibility="{Binding ProcesVisibility}">
                         <TextBlock Text="proces orde" FontSize="15" Foreground="Green" Margin="2"/>
                         <ComboBox  Height="20" Width="100" HorizontalAlignment="Left" VerticalAlignment="Top" IsEnabled="{Binding IsRunning}" SelectedItem="{Binding Orde}">
                             <ComboBoxItem Content="0orde"/>
@@ -205,7 +201,7 @@
                             <ComboBoxItem Content="2orde" IsSelected="True"/>
                         </ComboBox>
                     </WrapPanel>
-                    <WrapPanel Grid.Row="1" Grid.Column="1">
+                    <WrapPanel Grid.Row="1" Grid.Column="1" Visibility="{Binding ProcesVisibility}">
                         <TextBlock Text="dodetijd" HorizontalAlignment="Right" FontSize="15" Foreground="Green" Margin="2"/>
                         <ComboBox Height="20" Width="150" HorizontalAlignment="Left" VerticalAlignment="Top" IsEnabled="{Binding IsRunning}" SelectedItem="{Binding DodeTijd, Mode=TwoWay}">
                             <ComboBoxItem Content="geen dodetijd" IsSelected="True"/>
