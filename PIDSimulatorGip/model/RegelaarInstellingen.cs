@@ -64,7 +64,7 @@ namespace PIDSimulatorGip.model
             }
             set
             {
-                if (!string.IsNullOrEmpty(value))
+                    if (!string.IsNullOrEmpty(value))
                 {
                     string result = value.Substring(value.IndexOf(":") + 2);
                     _type = result;

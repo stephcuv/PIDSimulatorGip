@@ -41,12 +41,6 @@ namespace PIDSimulatorGip.viewmodel
 
             MyPlot = new PlotModel { Title = "regelaar + proces " };
 
-            KpMax = 100;
-            KiMax = 100;
-            KdMax = 100;
-            Tijdconstante = 50;
-            W = 50;
-
             _timer.Tick += Timer_Tick;
         }
 
@@ -73,7 +67,7 @@ namespace PIDSimulatorGip.viewmodel
         private bool _standardSimStatus = true;
         private bool _serialComSimStatus;
         private bool _stapsprongSimStatus;
-        public double SimulatieSnelheid { set { _simulatieSnelheid = Math.Round(value, 2); _timer.Interval = TimeSpan.FromMilliseconds(_simulatieSnelheid * 20); OnPropertyChanged(); } get { return _simulatieSnelheid; } }
+        public double SimulatieSnelheid { set { _simulatieSnelheid = Math.Round(value, 2); OnPropertyChanged(); } get { return _simulatieSnelheid; } }
         public bool IsRunning { get { return !_isRunning; } set { _isRunning = value; OnPropertyChanged(); OnPropertyChanged(nameof(PIDBerZichtbaarIsEnabled)); } }
         public bool SerialComActive { set { _serialComSimStatus = value; OnPropertyChanged(); } get { return _serialComSimStatus; } }
         public bool Stapsprong { set { _stapsprongSimStatus = value; OnPropertyChanged(); } get { return _stapsprongSimStatus; } }
@@ -87,6 +81,11 @@ namespace PIDSimulatorGip.viewmodel
         private Visibility _stapsprongVisibility = Visibility.Collapsed;
         private Visibility _simulatieSnelheidVisibility = Visibility.Visible;
         private Visibility _animatieVisibility = Visibility.Visible;
+        private Visibility _PIDStandaardNaamVisibility = Visibility.Visible;
+        private Visibility _PIDNonStandaardNaamVisibility = Visibility.Collapsed;
+
+        public Visibility PIDStandaardNaamVisibility { set { _PIDStandaardNaamVisibility = value; OnPropertyChanged(); } get { return _PIDStandaardNaamVisibility; } }
+        public Visibility PIDNonStandaardNaamVisibility { set { _PIDNonStandaardNaamVisibility = value; OnPropertyChanged(); } get { return _PIDNonStandaardNaamVisibility; } }
         public Visibility RegelaarVisibility { set { _regelaarVisibility = value; OnPropertyChanged(); } get { return _regelaarVisibility; } }
         public Visibility ProcesVisibility { set { _procesVisiblity = value; OnPropertyChanged(); } get { return _procesVisiblity; } }
         public Visibility SerialVisibility { set { _serialVisibility = value; OnPropertyChanged(); } get { return _serialVisibility; } }
@@ -119,6 +118,8 @@ namespace PIDSimulatorGip.viewmodel
         #endregion
 
         #region pid regelaar 
+
+        private string _prevType;
         public double Kp { get { return _RGLR.Kp; } set { if ((_RGLR.Kp + value) >= 0) { _RGLR.Kp = Math.Round(value, 3); } else { _RGLR.Kp = 0; } OnPropertyChanged(); } }
         public double Ki { get { return _RGLR.Ki; } set { if ((_RGLR.Ki + value) >= 0) { _RGLR.Ki = Math.Round(value, 3); } else { _RGLR.Ki = 0; } OnPropertyChanged(); } }
         public double Kd { get { return _RGLR.Kd; } set { if ((_RGLR.Kd + value) >= 0) { _RGLR.Kd = Math.Round(value, 3); } else { _RGLR.Kd = 0; } OnPropertyChanged(); } }
@@ -163,6 +164,12 @@ namespace PIDSimulatorGip.viewmodel
                 if (Ki > KiMax) { Ki = KiMax; }
                 if (Kd > KdMax) { Kd = KdMax; }
             }
+           if(!string.IsNullOrEmpty(_prevType)) if ((Type == "Standaard" && _prevType != "Standaard") || (_prevType == "Standaard" && Type != "Standaard"))
+            {
+                PIDStandaardNaamVisibility = (PIDStandaardNaamVisibility == Visibility.Visible) ? Visibility.Collapsed : Visibility.Visible;
+                PIDNonStandaardNaamVisibility = (PIDNonStandaardNaamVisibility == Visibility.Visible) ? Visibility.Collapsed : Visibility.Visible;
+            }
+            _prevType = Type;
         }
         #endregion
         #region proces
@@ -327,7 +334,11 @@ namespace PIDSimulatorGip.viewmodel
                     if (string.IsNullOrEmpty(DodeTijd)) missingValues.Add("proces dodetijd");
                     if (string.IsNullOrEmpty(Orde)) missingValues.Add("proces orde");
                     if (string.IsNullOrEmpty(Type)) missingValues.Add("Regelaar type");
-                    if (Kp <= 0) missingValues.Add("Versterkingsfactor P regelaar");
+                        if (Kp <= 0)
+                        {                    
+                        if (Type == "Standaard") missingValues.Add("Proportionele band");
+                        else missingValues.Add("Versterkingsfactor P regelaar");
+                        }
 
                     _messageBoxText = "volgende control(s) moeten een waarde krijgen voor het starten van de applicatie:\n" + string.Join("\n", missingValues);
 
@@ -375,8 +386,11 @@ namespace PIDSimulatorGip.viewmodel
                     List<string> missingValues = new List<string>();
                     if (!_serial.Connected) missingValues.Add("geen seriële communicatie actief");
                     if (string.IsNullOrEmpty(Type)) missingValues.Add("Regelaar type");
-                    if (Kp <= 0) missingValues.Add("Versterkingsfactor P regelaar");
-
+                    if (Kp <= 0)
+                    {
+                        if (Type == "Standaard") missingValues.Add("Proportionele band");
+                        else missingValues.Add("Versterkingsfactor P regelaar");
+                    }
                     _messageBoxText = "volgende control(s) moeten een waarde krijgen voor het starten van de applicatie:\n" + string.Join("\n", missingValues);
 
                     AskTheQuestion();
@@ -386,6 +400,7 @@ namespace PIDSimulatorGip.viewmodel
                 else
                 {
                     IsRunning = true;
+                    _timer.Interval = TimeSpan.FromMilliseconds(_simulatieSnelheid * 20);
                     GraphSeriesAdd();
                     _myPlot.ResetAllAxes();
                     _serial.SendSerialData($"{_RGLR.Berekening()}");
@@ -598,7 +613,7 @@ namespace PIDSimulatorGip.viewmodel
                             break;
                     }
                 }
-                _currentXaxis += Tijdconstante;
+                _currentXaxis += 1;
             }
 
 
@@ -607,7 +622,7 @@ namespace PIDSimulatorGip.viewmodel
                 var procesWaardes = MyPlot.Series[0] as LineSeries;
                 var wensWaardes = MyPlot.Series[1] as LineSeries;
 
-                _currentXaxis += Tijdconstante;
+                _currentXaxis += 1;
 
                 procesWaardes.Points.Add(new DataPoint(_currentXaxis, _procesWaarde));
                 wensWaardes.Points.Add(new DataPoint(_currentXaxis, _stapsprongWaarde));
@@ -620,7 +635,7 @@ namespace PIDSimulatorGip.viewmodel
             var xAxis = MyPlot.Axes.FirstOrDefault(a => a.Position == AxisPosition.Bottom);
             if (xAxis != null)
             {
-                if (!_serialComSimStatus) xAxis.Minimum = _currentXaxis - (_maxXAxisPoints * Tijdconstante); // Keeps last 100 points visible
+                if (!_serialComSimStatus) xAxis.Minimum = _currentXaxis - _maxXAxisPoints; // Keeps last 100 points visible
                 else xAxis.Minimum = _currentXaxis - _maxXAxisPoints;
                 xAxis.Maximum = _currentXaxis;
             }

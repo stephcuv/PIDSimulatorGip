@@ -40,8 +40,9 @@
                                 </ComboBox>
                             </WrapPanel>
 
-                            <TextBlock HorizontalAlignment="Center" FontSize="15" Foreground="Black" Text="kp waarde "/>
-                            
+                            <TextBlock HorizontalAlignment="Center" FontSize="15" Foreground="Black" Text="kp waarde " Visibility="{Binding PIDNonStandaardNaamVisibility}"/>
+                            <TextBlock HorizontalAlignment="Center" FontSize="15" Foreground="Black" Text="proportionele band" Visibility="{Binding PIDStandaardNaamVisibility}"/>
+
                             <WrapPanel HorizontalAlignment="Center">
                                 <Slider  Minimum="0" Maximum="{Binding KpMax}" Width="150" Value="{Binding Kp}"/>
                                 <StackPanel>
@@ -52,7 +53,8 @@
                             </WrapPanel>
 
 
-                            <TextBlock HorizontalAlignment="Center" FontSize="15" Foreground="Black" Text="ki waarde "/>
+                            <TextBlock HorizontalAlignment="Center" FontSize="15" Foreground="Black" Text="ki waarde " Visibility="{Binding PIDNonStandaardNaamVisibility}"/>
+                            <TextBlock HorizontalAlignment="Center" FontSize="15" Foreground="Black" Text="voorsteltijd" Visibility="{Binding PIDStandaardNaamVisibility}"/>
 
                             <WrapPanel HorizontalAlignment="Center">
                                 <Slider Minimum="0" Maximum="{Binding KiMax}" Width="150" Value="{Binding Ki}"/>
@@ -65,7 +67,9 @@
 
 
 
-                            <TextBlock HorizontalAlignment="Center" FontSize="15" Foreground="Black" Text="kd waarde "/>
+                            <TextBlock HorizontalAlignment="Center" FontSize="15" Foreground="Black" Text="kd waarde " Visibility="{Binding PIDNonStandaardNaamVisibility}"/>
+                            <TextBlock HorizontalAlignment="Center" FontSize="15" Foreground="Black" Text="nasteltijd" Visibility="{Binding PIDStandaardNaamVisibility}"/>
+
 
                             <WrapPanel HorizontalAlignment="Center">
                                 <Slider Minimum="0" Maximum="{Binding KdMax}" Width="150" Value="{Binding Kd}"/>
