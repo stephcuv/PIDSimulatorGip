@@ -64,10 +64,9 @@ namespace PIDSimulatorGip.model
             }
             set
             {
-                    if (!string.IsNullOrEmpty(value))
+                if (!string.IsNullOrEmpty(value))
                 {
-                    string result = value.Substring(value.IndexOf(":") + 2);
-                    _type = result;
+                    _type = value;
                 }
             }
         }
@@ -275,7 +274,7 @@ namespace PIDSimulatorGip.model
             {
                 _iWaarde = _prevIWaarde + (_kc / _ki) * _foutWaardes[0] * _samplingRate;
             }
-            _dWaarde = -_kc * (_kd/60) * ((_meetWaardes[0] - _meetWaardes[1]) / _samplingRate);
+            _dWaarde = -_kc * (_kd / 60) * ((_meetWaardes[0] - _meetWaardes[1]) / _samplingRate);
 
             _prevIWaarde = _iWaarde;
 

@@ -41,8 +41,7 @@ namespace PIDSimulatorGip.model
             set
             {
                 if (string.IsNullOrEmpty(value)) { return; }
-                string result = value.Substring(value.IndexOf(":") + 2);
-                _orde = result;
+                _orde = value;
             }
         }
 
@@ -56,7 +55,7 @@ namespace PIDSimulatorGip.model
             set
             {
                 if (string.IsNullOrEmpty(value)) { return; }
-                DodetijdChoice = value.Substring(value.IndexOf(":") + 2);
+                DodetijdChoice = value;
                 switch (DodetijdChoice)
                 {
                     case "geen dodetijd":

@@ -5,6 +5,7 @@ using OxyPlot.Series;
 using PIDSimulatorGip.model;
 using PIDSimulatorGip.MVVM;
 using PIDSimulatorGip.view;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO.Ports;
@@ -43,6 +44,10 @@ namespace PIDSimulatorGip.viewmodel
             GraphSeriesAdd();
 
             Tijdconstante = 50;
+            W = 50;
+            Type = "Standaard";
+            Orde = "2orde";
+            DodeTijd = "geen dodetijd";
 
             _timer.Tick += Timer_Tick;
         }
@@ -53,12 +58,12 @@ namespace PIDSimulatorGip.viewmodel
 
 
         public RelayCommand AdjustValueCommand => new RelayCommand(execute => { FinetuneFuncie(execute); });
-        public RelayCommand PIDBerekeningenZichtbaarCommand => new RelayCommand(execute => {PIDBerekeningenZichtbaar = !_PIDBerekeningenZichtbaar; GraphSeriesAdd(); OnPropertyChanged(); }, canExecute => { return !_isRunning; });
+        public RelayCommand PIDBerekeningenZichtbaarCommand => new RelayCommand(execute => { PIDBerekeningenZichtbaar = !_PIDBerekeningenZichtbaar; GraphSeriesAdd(); OnPropertyChanged(); }, canExecute => { return !_isRunning; });
 
 
 
         #region relaycommands voor de applicatie stand te wijzigen.
-        public RelayCommand StapsprongCommand => new RelayCommand(execute => { StapsprongGridVisibility();  GraphReset(); GraphSeriesAdd(); }, canExecute => { return !_isRunning; });
+        public RelayCommand StapsprongCommand => new RelayCommand(execute => { StapsprongGridVisibility(); GraphReset(); GraphSeriesAdd(); }, canExecute => { return !_isRunning; });
         public RelayCommand SerialCommCommand => new RelayCommand(execute => { SerialCommGridVisibility(); Serial(); GraphReset(); GraphSeriesAdd(); }, canExecute => { return !_isRunning; });
         public RelayCommand StartStapsprongCommand => new RelayCommand(execute => { StartStapsprongFunction(); }, canExecute => { return _isRunning; });
         public PlotModel MyPlot { get { return _myPlot; } set { _myPlot = value; OnPropertyChanged(); } }
@@ -101,7 +106,7 @@ namespace PIDSimulatorGip.viewmodel
             if (!_serialComSimStatus) _standardSimStatus = !_standardSimStatus;
             _stapsprongSimStatus = !_stapsprongSimStatus;
             _proces.StapsprongOn = _stapsprongSimStatus;
-            if(_stapsprongSimStatus) PIDBerZichtbaarIsEnabled = false;
+            if (_stapsprongSimStatus) PIDBerZichtbaarIsEnabled = false;
             else PIDBerZichtbaarIsEnabled = true;
             RegelaarVisibility = (RegelaarVisibility == Visibility.Visible) ? Visibility.Collapsed : Visibility.Visible;
             StapsprongVisibility = (StapsprongVisibility == Visibility.Visible) ? Visibility.Collapsed : Visibility.Visible;
@@ -127,9 +132,15 @@ namespace PIDSimulatorGip.viewmodel
         public double Ki { get { return _RGLR.Ki; } set { if ((_RGLR.Ki + value) >= 0) { _RGLR.Ki = Math.Round(value, 3); } else { _RGLR.Ki = 0; } OnPropertyChanged(); } }
         public double Kd { get { return _RGLR.Kd; } set { if ((_RGLR.Kd + value) >= 0) { _RGLR.Kd = Math.Round(value, 3); } else { _RGLR.Kd = 0; } OnPropertyChanged(); } }
         public double W { get { return _RGLR.W; } set { if (value >= 0) { _RGLR.W = Math.Round(value, 2); _proces.T = 0; } else { _RGLR.W = 0; } OnPropertyChanged(); } }
-        public string Type { set { _RGLR.Type = value; OnPropertyChanged(); pidStandaardCheck();  } get { return _RGLR.Type; } }
+        public string Type { set { _RGLR.Type = value; OnPropertyChanged(); pidStandaardCheck(); } get { return _RGLR.Type; } }
         public double SamplingRate { set { _RGLR.SamplingRate = Math.Round(value, 2); OnPropertyChanged(); } get { return _RGLR.SamplingRate; } }
-
+        public ObservableCollection<string> TypeChoice { get; } = new ObservableCollection<string>
+        {
+        "Standaard",
+        "Type A",
+        "Type B",
+        "Type C"
+        };
 
         private bool _PIDBerekeningenZichtbaar = false;
         private bool _PIDBerZichtbaarIsEnabled = true;
@@ -158,16 +169,17 @@ namespace PIDSimulatorGip.viewmodel
             }
             else
             {
-                KpMax = 5;
-                KiMax = 5;
-                KdMax = 5;
+                KpMax = 10;
+                KiMax = 10;
+                KdMax = 10;
                 if (Tijdconstante > TijdconstanteMax) { Tijdconstante = TijdconstanteMax; }
                 if (Tijdconstante < TijdconstanteMin) { Tijdconstante = TijdconstanteMin; }
                 if (Kp > KpMax) { Kp = KpMax; }
                 if (Ki > KiMax) { Ki = KiMax; }
                 if (Kd > KdMax) { Kd = KdMax; }
             }
-           if(!string.IsNullOrEmpty(_prevType)) if ((Type == "Standaard" && _prevType != "Standaard") || (_prevType == "Standaard" && Type != "Standaard"))
+
+            if (!string.IsNullOrEmpty(_prevType) && (_prevType == "Standaard") != (Type == "Standaard"))
             {
                 PIDStandaardNaamVisibility = (PIDStandaardNaamVisibility == Visibility.Visible) ? Visibility.Collapsed : Visibility.Visible;
                 PIDNonStandaardNaamVisibility = (PIDNonStandaardNaamVisibility == Visibility.Visible) ? Visibility.Collapsed : Visibility.Visible;
@@ -179,6 +191,21 @@ namespace PIDSimulatorGip.viewmodel
         public double Tijdconstante { set { if ((_proces.Tijdconstante + value) >= 0) { _proces.Tijdconstante = Math.Round(value); } else { _proces.Tijdconstante = 1; } OnPropertyChanged(); } get { return _proces.Tijdconstante; } }
         public string DodeTijd { set { _proces.DodeTijd = value; OnPropertyChanged(); } get { return _proces.DodeTijd; } }
         public string Orde { set { _proces.Orde = value; OnPropertyChanged(); } get { return _proces.Orde; } }
+        public ObservableCollection<string> OrdeChoice { get; } = new ObservableCollection<string>
+        {
+        "0orde",
+        "1orde",
+        "2orde"
+        };
+        public ObservableCollection<string> DodetijdChoice { get; } = new ObservableCollection<string>
+        {
+        "geen dodetijd",
+        "klein beetje dodetijd",
+        "wat dodetijd",
+        "gemiddeld dodetijd",
+        "meer dan gemiddeld dodetijd",
+        "veel dodetijd"
+        };
 
         private double _tijdconstanteMax = 200;
         private double _tijdconstanteMin = 1;
@@ -253,8 +280,8 @@ namespace PIDSimulatorGip.viewmodel
                     _serialSubscribed = true;
                 }
 
-            }            
-            
+            }
+
             Task.Run(() =>
             {
                 while (!_serial.Connected && _serialComSimStatus)
@@ -337,11 +364,11 @@ namespace PIDSimulatorGip.viewmodel
                     if (string.IsNullOrEmpty(DodeTijd)) missingValues.Add("proces dodetijd");
                     if (string.IsNullOrEmpty(Orde)) missingValues.Add("proces orde");
                     if (string.IsNullOrEmpty(Type)) missingValues.Add("Regelaar type");
-                        if (Kp <= 0)
-                        {                    
+                    if (Kp <= 0)
+                    {
                         if (Type == "Standaard") missingValues.Add("Proportionele band");
                         else missingValues.Add("Versterkingsfactor P regelaar");
-                        }
+                    }
 
                     _messageBoxText = "volgende control(s) moeten een waarde krijgen voor het starten van de applicatie:\n" + string.Join("\n", missingValues);
 
@@ -429,18 +456,18 @@ namespace PIDSimulatorGip.viewmodel
                 _serial.DataReceived -= _dataReceivedHandler;
             }
 
-           
 
-            DodeTijd = ": geen dodetijd";
-            Orde = ": 2orde";
-            Type = ": Standaard";
+
+            DodeTijd = "geen dodetijd";
+            Orde = "2orde";
+            Type = "Standaard";
 
             if (_stapsprongSimStatus)
             {
                 StapsprongChangeWaarde = 0;
                 StapsprongWaarde = 0;
             }
-            
+
             Kp = 0;
             Ki = 0;
             Kd = 0;
@@ -467,6 +494,7 @@ namespace PIDSimulatorGip.viewmodel
             MyPlot.Legends.Clear();
             MyPlot.ResetAllAxes();
             MyPlot.InvalidatePlot(true);
+            GraphSeriesAdd();
         }
 
         private void Timer_Tick(object? sender, EventArgs e)
@@ -554,7 +582,7 @@ namespace PIDSimulatorGip.viewmodel
                 MyPlot.Series.Add(new LineSeries { Title = "I Waarde", TrackerFormatString = "tijdstip: {2:0.000} sec\n" + "I Waarde: {4:0.00}" });
                 MyPlot.Series.Add(new LineSeries { Title = "D Waarde", TrackerFormatString = "tijdstip: {2:0.000} sec\n" + "D Waarde: {4:0.00}" });
             }
-            else if(MyPlot.Series.Count > 3 && !PIDBerekeningenZichtbaar) 
+            else if (MyPlot.Series.Count > 3 && !PIDBerekeningenZichtbaar)
             {
 
                 for (int i = MyPlot.Series.Count - 1; i >= 0; i--)

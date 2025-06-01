@@ -31,13 +31,7 @@
                             <TextBlock FontSize="18" Foreground="Black" HorizontalAlignment="Center" Text="regelaar"/>
                             <WrapPanel HorizontalAlignment="Center">
                                 <TextBlock Text="type" FontSize="15" Foreground="Black" Margin="0,0,5,0"/>
-                                <ComboBox IsEnabled="{Binding IsRunning}" Height="20" Width="150" SelectedItem="{Binding Type}">
-                                    <ComboBoxItem Content="Standaard" IsSelected="True"/>
-                                    <ComboBoxItem Content="Type A"/>
-                                    <ComboBoxItem Content="Type B"/>
-                                    <ComboBoxItem Content="Type C"/>
-
-                                </ComboBox>
+                                <ComboBox IsEnabled="{Binding IsRunning}" Height="20" Width="150" SelectedItem="{Binding Type}" ItemsSource="{Binding TypeChoice}"/>
                             </WrapPanel>
 
                             <TextBlock HorizontalAlignment="Center" FontSize="15" Foreground="Black" Text="kp waarde " Visibility="{Binding PIDNonStandaardNaamVisibility}"/>
@@ -199,22 +193,11 @@
 
                     <WrapPanel Grid.Row="1" Visibility="{Binding ProcesVisibility}">
                         <TextBlock Text="proces orde" FontSize="15" Foreground="Green" Margin="2"/>
-                        <ComboBox  Height="20" Width="100" HorizontalAlignment="Left" VerticalAlignment="Top" IsEnabled="{Binding IsRunning}" SelectedItem="{Binding Orde}">
-                            <ComboBoxItem Content="0orde"/>
-                            <ComboBoxItem Content="1orde"/>
-                            <ComboBoxItem Content="2orde" IsSelected="True"/>
-                        </ComboBox>
+                        <ComboBox  Height="20" Width="100" HorizontalAlignment="Left" VerticalAlignment="Top" IsEnabled="{Binding IsRunning}" SelectedItem="{Binding Orde}" ItemsSource="{Binding OrdeChoice}"/>
                     </WrapPanel>
                     <WrapPanel Grid.Row="1" Grid.Column="1" Visibility="{Binding ProcesVisibility}">
                         <TextBlock Text="dodetijd" HorizontalAlignment="Right" FontSize="15" Foreground="Green" Margin="2"/>
-                        <ComboBox Height="20" Width="150" HorizontalAlignment="Left" VerticalAlignment="Top" IsEnabled="{Binding IsRunning}" SelectedItem="{Binding DodeTijd, Mode=TwoWay}">
-                            <ComboBoxItem Content="geen dodetijd" IsSelected="True"/>
-                            <ComboBoxItem Content="klein beetje dodetijd"/>
-                            <ComboBoxItem Content="wat dodetijd"/>
-                            <ComboBoxItem Content="gemiddeld dodetijd"/>
-                            <ComboBoxItem Content="meer dan gemiddeld dodetijd"/>
-                            <ComboBoxItem Content="veel dodetijd"/>
-                        </ComboBox>
+                        <ComboBox Height="20" Width="150" HorizontalAlignment="Left" VerticalAlignment="Top" IsEnabled="{Binding IsRunning}" SelectedItem="{Binding DodeTijd}" ItemsSource="{Binding DodetijdChoice}"/>
                     </WrapPanel>
                     <!--#region graph grid-->
                     <Grid Grid.Row="3" Grid.ColumnSpan="7" Margin="5" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
