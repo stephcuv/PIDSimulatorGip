@@ -40,6 +40,9 @@ namespace PIDSimulatorGip.viewmodel
             _timer = new DispatcherTimer();
 
             MyPlot = new PlotModel { Title = "regelaar + proces " };
+            GraphSeriesAdd();
+
+            Tijdconstante = 50;
 
             _timer.Tick += Timer_Tick;
         }
@@ -49,7 +52,7 @@ namespace PIDSimulatorGip.viewmodel
         public RelayCommand PauzeCommand => new RelayCommand(exectue => { PauseSimulation(); }, canExecute => { return _isRunning; });
 
 
-        public RelayCommand AdjustValueCommand => new RelayCommand(execute => { AdjustValue(execute); });
+        public RelayCommand AdjustValueCommand => new RelayCommand(execute => { FinetuneFuncie(execute); });
         public RelayCommand PIDBerekeningenZichtbaarCommand => new RelayCommand(execute => {PIDBerekeningenZichtbaar = !_PIDBerekeningenZichtbaar; GraphSeriesAdd(); OnPropertyChanged(); }, canExecute => { return !_isRunning; });
 
 
@@ -274,7 +277,7 @@ namespace PIDSimulatorGip.viewmodel
         #endregion
 
         #region simulation control functions 
-        private void AdjustValue(object parameter)
+        private void FinetuneFuncie(object parameter)
         {
             string? value = Convert.ToString(parameter);
 
@@ -460,6 +463,7 @@ namespace PIDSimulatorGip.viewmodel
 
             _currentXaxis = 0;
             MyPlot.Series.Clear();
+            MyPlot.Axes.Clear();
             MyPlot.Legends.Clear();
             MyPlot.ResetAllAxes();
             MyPlot.InvalidatePlot(true);
@@ -508,9 +512,18 @@ namespace PIDSimulatorGip.viewmodel
                 };
                 MyPlot.Legends.Add(legend);
 
+                MyPlot.Axes.Clear();
+                MyPlot.Axes.Add(new LinearAxis
+                {
+                    Position = AxisPosition.Left,
+                    Title = "procentuele waarde",
+                    Maximum = 105,
+                    Minimum = -5,
+                });
 
                 if (_standardSimStatus)
                 {
+
                     MyPlot.Title = "regelaar + proces";
                     MyPlot.Series.Add(new LineSeries { Title = "Regelaar Waarde", TrackerFormatString = "tijdstip: {2:0.000} sec\n" + "regelaar Waarde: {4:0.00}" });
                     MyPlot.Series.Add(new LineSeries { Title = "Proces Waarde", TrackerFormatString = "tijdstip: {2:0.000} sec\n" + "proces Waarde: {4:0.00}" });
@@ -537,29 +550,12 @@ namespace PIDSimulatorGip.viewmodel
             }
             if (_PIDBerekeningenZichtbaar && MyPlot.Series.Count == 3)
             {
-                MyPlot.Axes.Clear();
-                MyPlot.Axes.Add(new LinearAxis
-                {
-                    Position = AxisPosition.Left,
-                    Title = "regelaar/proces + PID berekeningen",
-                    Maximum = 105,
-                    Minimum = -5,
-                });
-
                 MyPlot.Series.Add(new LineSeries { Title = "P Waarde", TrackerFormatString = "tijdstip: {2:0.000} sec\n" + "P Waarde: {4:0.00}" });
                 MyPlot.Series.Add(new LineSeries { Title = "I Waarde", TrackerFormatString = "tijdstip: {2:0.000} sec\n" + "I Waarde: {4:0.00}" });
                 MyPlot.Series.Add(new LineSeries { Title = "D Waarde", TrackerFormatString = "tijdstip: {2:0.000} sec\n" + "D Waarde: {4:0.00}" });
             }
             else if(MyPlot.Series.Count > 3 && !PIDBerekeningenZichtbaar) 
             {
-                MyPlot.Axes.Clear();
-                MyPlot.Axes.Add(new LinearAxis
-                {
-                    Position = AxisPosition.Left,
-                    Title = "regelaar/proces",
-                    Maximum = 105,
-                    Minimum = -5,
-                });
 
                 for (int i = MyPlot.Series.Count - 1; i >= 0; i--)
                 {
